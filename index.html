@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PhenilRoopa.AI — Your Personal AI Assistant</title>
+  <meta name="description" content="PhenilRoopa.AI — A powerful AI assistant that answers questions, writes content, and helps you build anything."/>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-logo">
+    <span class="logo-icon">◈</span>
+    <span class="logo-text">PhenilRoopa<span class="logo-ai">.AI</span></span>
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#demo">Try It</a>
+    <a href="#about">About</a>
+    <a href="#chat" class="nav-cta">Launch AI →</a>
+  </div>
+  <button class="hamburger" id="hamburger">☰</button>
+</nav>
+
+<!-- HERO SECTION -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="grid-lines"></div>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">✦ AI-Powered Intelligence</div>
+    <h1 class="hero-title">
+      Meet <span class="gradient-text">PhenilRoopa</span><br/>
+      Your AI Brain
+    </h1>
+    <p class="hero-sub">
+      Ask anything. Build anything. Understand everything.<br/>
+      Powered by cutting-edge AI — ready to help you 24/7.
+    </p>
+    <div class="hero-buttons">
+      <a href="#chat" class="btn-primary">Try For Free →</a>
+      <a href="#features" class="btn-secondary">See Features</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">99%</span><span class="stat-label">Accuracy</span></div>
+      <div class="stat-divider">|</div>
+      <div class="stat"><span class="stat-num">∞</span><span class="stat-label">Questions</span></div>
+      <div class="stat-divider">|</div>
+      <div class="stat"><span class="stat-num">24/7</span><span class="stat-label">Available</span></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="ai-circle">
+      <div class="ai-ring ring1"></div>
+      <div class="ai-ring ring2"></div>
+      <div class="ai-ring ring3"></div>
+      <div class="ai-core">◈</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES SECTION -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-tag">✦ Capabilities</p>
+      <h2>Everything You Need</h2>
+      <p class="section-sub">PhenilRoopa.AI is built for real work — not just chat.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card" data-delay="0">
+        <div class="feature-icon">🧠</div>
+        <h3>Smart Answers</h3>
+        <p>Ask any question and get accurate, thoughtful answers instantly. Research, explain, summarize — done in seconds.</p>
+      </div>
+      <div class="feature-card" data-delay="1">
+        <div class="feature-icon">✍️</div>
+        <h3>Content Writing</h3>
+        <p>Generate essays, emails, blogs, stories, code, and more. Your AI writing partner for every task.</p>
+      </div>
+      <div class="feature-card" data-delay="2">
+        <div class="feature-icon">💻</div>
+        <h3>Code Assistant</h3>
+        <p>Write, debug, explain, and refactor code in any programming language. From beginner to expert.</p>
+      </div>
+      <div class="feature-card" data-delay="3">
+        <div class="feature-icon">📊</div>
+        <h3>Data Analysis</h3>
+        <p>Analyze data, create summaries, find patterns, and explain complex topics in plain language.</p>
+      </div>
+      <div class="feature-card" data-delay="4">
+        <div class="feature-icon">🌍</div>
+        <h3>Multilingual</h3>
+        <p>Speak in Hindi, Gujarati, English, or any language. PhenilRoopa understands and responds in your language.</p>
+      </div>
+      <div class="feature-card" data-delay="5">
+        <div class="feature-icon">⚡</div>
+        <h3>Lightning Fast</h3>
+        <p>Responses in under 2 seconds. No waiting, no loading — just instant intelligence at your fingertips.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO / CHAT SECTION -->
+<section class="chat-section" id="chat">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-tag">✦ Live Demo</p>
+      <h2>Try PhenilRoopa.AI Now</h2>
+      <p class="section-sub">Type a message below and get an instant AI response.</p>
+    </div>
+    <div class="chat-wrapper">
+      <div class="chat-box" id="chatBox">
+        <div class="chat-message ai-message">
+          <div class="msg-avatar">◈</div>
+          <div class="msg-bubble">
+            <p>Namaste! 🙏 I'm PhenilRoopa.AI — your personal AI assistant.</p>
+            <p>Ask me anything — questions, writing, code, ideas, or just have a conversation!</p>
+          </div>
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="userInput" class="chat-input" placeholder="Ask me anything... (e.g. Write a poem about Mumbai)" />
+        <button class="chat-send" id="sendBtn">
+          <span class="send-icon">→</span>
+        </button>
+      </div>
+      <div class="quick-prompts">
+        <button class="quick-btn" onclick="setPrompt('Write a short poem about India')">✦ Poem about India</button>
+        <button class="quick-btn" onclick="setPrompt('Explain machine learning in simple words')">✦ Explain ML</button>
+        <button class="quick-btn" onclick="setPrompt('Write a Python hello world program')">✦ Python code</button>
+        <button class="quick-btn" onclick="setPrompt('Tell me a fun fact about space')">✦ Fun space fact</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT SECTION -->
+<section class="about-section" id="about">
+  <div class="container about-grid">
+    <div class="about-text">
+      <p class="section-tag">✦ About</p>
+      <h2>Built for India,<br/>Made for the World</h2>
+      <p>PhenilRoopa.AI was created to give everyone access to powerful AI — in their own language, at zero cost. Whether you're a student, developer, writer, or entrepreneur, this AI is for you.</p>
+      <p>Built with the Claude AI API, hosted for free on GitHub Pages — proving that world-class AI tools don't need to cost a fortune.</p>
+      <a href="#chat" class="btn-primary" style="margin-top:1.5rem; display:inline-block;">Start Using Free →</a>
+    </div>
+    <div class="about-visual">
+      <div class="about-card">
+        <div class="about-icon">🚀</div>
+        <h4>Free Forever</h4>
+        <p>No subscriptions. No hidden fees. Just pure AI power.</p>
+      </div>
+      <div class="about-card">
+        <div class="about-icon">🔒</div>
+        <h4>Private & Secure</h4>
+        <p>Your conversations are never stored or sold.</p>
+      </div>
+      <div class="about-card">
+        <div class="about-icon">🌐</div>
+        <h4>Open Source</h4>
+        <p>Fully available on GitHub for anyone to use and modify.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <span class="logo-icon">◈</span>
+      <span class="logo-text">PhenilRoopa<span class="logo-ai">.AI</span></span>
+    </div>
+    <p class="footer-sub">Made with ❤️ by PhenilRoopa · Powered by Claude AI</p>
+    <div class="footer-links">
+      <a href="https://github.com/" target="_blank">GitHub</a>
+      <a href="#chat">Try AI</a>
+      <a href="#features">Features</a>
+    </div>
+    <p class="footer-copy">© 2025 PhenilRoopa.AI — Free & Open Source</p>
+  </div>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>
