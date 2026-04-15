@@ -5,9 +5,13 @@
 // ---- CONFIG ----
 // IMPORTANT: Replace this with your real Anthropic API key
 // Get one free at: https://console.anthropic.com/
-const API_KEY = "YOUR_ANTHROPIC_API_KEY_HERE";
-const API_URL = "https://api.anthropic.com/v1/messages";
-const MODEL = "claude-opus-4-5";
+// const API_KEY = "YOUR_ANTHROPIC_API_KEY_HERE";
+// const API_URL = "https://api.anthropic.com/v1/messages";
+// const MODEL = "claude-opus-4-5";
+
+const API_KEY = "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";
+const API_URL = "https://api.openai.com/v1/chat/completions";
+const MODEL = "gpt-4o-mini";
 
 // ---- DOM REFERENCES ----
 const chatBox = document.getElementById("chatBox");
