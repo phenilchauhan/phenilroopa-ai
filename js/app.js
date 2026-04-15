@@ -1,14 +1,8 @@
 // ============================================================
-// PhenilRoopa.AI — App Logic
+// PhenilRoopa.AI — App Logic (FIXED)
 // ============================================================
 
 // ---- CONFIG ----
-// IMPORTANT: Replace this with your real Anthropic API key
-// Get one free at: https://console.anthropic.com/
-// const API_KEY = "YOUR_ANTHROPIC_API_KEY_HERE";
-// const API_URL = "https://api.anthropic.com/v1/messages";
-// const MODEL = "claude-opus-4-5";
-
 const API_KEY = "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";
 const API_URL = "https://api.openai.com/v1/chat/completions";
 const MODEL = "gpt-4o-mini";
@@ -26,15 +20,12 @@ async function sendMessage() {
   const text = userInput.value.trim();
   if (!text) return;
 
-  // Add user message to UI
   addMessage("user", text);
   userInput.value = "";
   sendBtn.disabled = true;
 
-  // Add to history
   conversationHistory.push({ role: "user", content: text });
 
-  // Show typing indicator
   const typingId = showTyping();
 
   try {
@@ -42,23 +33,18 @@ async function sendMessage() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": API_KEY,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true"
+        "Authorization": `Bearer ${API_KEY}`   // ✅ FIXED
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 1024,
-        system: `You are PhenilRoopa.AI — a friendly, helpful, and intelligent AI assistant created by PhenilRoopa. 
-You are helpful, honest, and knowledgeable. You can:
-- Answer any questions clearly and accurately
-- Write essays, poems, stories, emails, and any content
-- Help with coding in any programming language
-- Explain complex topics in simple terms
-- Speak in English, Hindi, Gujarati, or any language the user uses
-
-Keep responses concise but complete. Be warm and encouraging. If someone writes in Hindi or Gujarati, respond in that language.`,
-        messages: conversationHistory
+        messages: [
+          {
+            role: "system",
+            content: "You are PhenilRoopa.AI — a helpful assistant."
+          },
+          ...conversationHistory
+        ],
+        max_tokens: 1000
       })
     });
 
@@ -70,21 +56,16 @@ Keep responses concise but complete. Be warm and encouraging. If someone writes 
     }
 
     const data = await response.json();
-    const aiText = data.content[0]?.text || "Sorry, I couldn't generate a response.";
 
-    // Add AI response to history and UI
+    // ✅ FIXED RESPONSE FORMAT
+    const aiText = data.choices?.[0]?.message?.content || "No response";
+
     conversationHistory.push({ role: "assistant", content: aiText });
     addMessage("ai", aiText);
 
   } catch (error) {
     removeTyping(typingId);
-    let errorMsg = "⚠️ Could not connect to AI. ";
-    if (API_KEY === "YOUR_ANTHROPIC_API_KEY_HERE") {
-      errorMsg += "Please add your Anthropic API key in js/app.js (replace YOUR_ANTHROPIC_API_KEY_HERE). Get a free key at https://console.anthropic.com/";
-    } else {
-      errorMsg += error.message;
-    }
-    addMessage("ai", errorMsg);
+    addMessage("ai", "⚠️ Error: " + error.message);
   }
 
   sendBtn.disabled = false;
@@ -103,9 +84,7 @@ function addMessage(role, text) {
   const bubble = document.createElement("div");
   bubble.className = "msg-bubble";
 
-  // Format text: split into paragraphs, handle code blocks
-  const formatted = formatText(text);
-  bubble.innerHTML = formatted;
+  bubble.innerHTML = formatText(text);
 
   wrapper.appendChild(avatar);
   wrapper.appendChild(bubble);
@@ -115,26 +94,15 @@ function addMessage(role, text) {
 
 // ---- FORMAT TEXT ----
 function formatText(text) {
-  // Handle code blocks
   text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, (_, lang, code) => {
-    return `<pre style="background:rgba(0,0,0,0.4);border:1px solid rgba(124,92,252,0.3);border-radius:8px;padding:0.8rem;font-family:'Space Mono',monospace;font-size:0.8rem;overflow-x:auto;margin:0.5rem 0;">${escapeHtml(code.trim())}</pre>`;
+    return `<pre style="background:#111;padding:10px;border-radius:6px;overflow:auto;">${escapeHtml(code)}</pre>`;
   });
 
-  // Handle inline code
-  text = text.replace(/`([^`]+)`/g, '<code style="background:rgba(124,92,252,0.2);padding:1px 5px;border-radius:4px;font-family:monospace;">$1</code>');
-
-  // Handle **bold**
+  text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
   text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-  // Handle *italic*
   text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
 
-  // Convert newlines to paragraphs
-  const paragraphs = text.split("\n\n").filter(p => p.trim());
-  return paragraphs.map(p => {
-    const lines = p.split("\n").join("<br/>");
-    return `<p>${lines}</p>`;
-  }).join("");
+  return text.split("\n").map(line => `<p>${line}</p>`).join("");
 }
 
 function escapeHtml(text) {
@@ -154,16 +122,12 @@ function showTyping() {
 
   const bubble = document.createElement("div");
   bubble.className = "msg-bubble";
-  bubble.innerHTML = `<div class="typing-indicator">
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-  </div>`;
+  bubble.innerHTML = "Typing...";
 
   wrapper.appendChild(avatar);
   wrapper.appendChild(bubble);
   chatBox.appendChild(wrapper);
-  chatBox.scrollTop = chatBox.scrollHeight;
+
   return id;
 }
 
@@ -172,37 +136,12 @@ function removeTyping(id) {
   if (el) el.remove();
 }
 
-// ---- QUICK PROMPT ----
-function setPrompt(text) {
-  userInput.value = text;
-  userInput.focus();
-}
-
-// ---- EVENT LISTENERS ----
+// ---- EVENTS ----
 sendBtn.addEventListener("click", sendMessage);
+
 userInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && !e.shiftKey) {
+  if (e.key === "Enter") {
     e.preventDefault();
     sendMessage();
-  }
-});
-
-// ---- MOBILE NAV ----
-const hamburger = document.getElementById("hamburger");
-hamburger.addEventListener("click", () => {
-  const navLinks = document.querySelector(".nav-links");
-  if (navLinks.style.display === "flex") {
-    navLinks.style.display = "none";
-  } else {
-    navLinks.style.display = "flex";
-    navLinks.style.flexDirection = "column";
-    navLinks.style.position = "absolute";
-    navLinks.style.top = "64px";
-    navLinks.style.left = "0";
-    navLinks.style.right = "0";
-    navLinks.style.background = "rgba(5,5,10,0.98)";
-    navLinks.style.padding = "1rem 2.5rem 1.5rem";
-    navLinks.style.borderBottom = "1px solid rgba(255,255,255,0.08)";
-    navLinks.style.gap = "1.2rem";
   }
 });
