@@ -5,7 +5,7 @@ async function sendMessage() {
   const chatBox = document.getElementById("chat");
 
   if (!inputEl || !chatBox) {
-    console.error("Missing HTML elements: message or chat");
+    console.error("Missing HTML elements");
     return;
   }
 
@@ -13,7 +13,6 @@ async function sendMessage() {
   if (!input) return;
 
   chatBox.innerHTML += `<div class="user">You: ${input}</div>`;
-  chatBox.scrollTop = chatBox.scrollHeight;
 
   inputEl.value = "";
 
@@ -26,10 +25,8 @@ async function sendMessage() {
 
     const data = await res.json();
 
-    chatBox.innerHTML += `<div class="bot">AI: ${data.reply || data.error}</div>`;
-    chatBox.scrollTop = chatBox.scrollHeight;
-
+    chatBox.innerHTML += `<div class="bot">AI: ${data.reply}</div>`;
   } catch (err) {
-    chatBox.innerHTML += `<div class="bot">AI: Error connecting to server</div>`;
+    chatBox.innerHTML += `<div class="bot">Error connecting server</div>`;
   }
 }
