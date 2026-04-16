@@ -4,16 +4,10 @@ async function sendMessage() {
   const inputEl = document.getElementById("message");
   const chatBox = document.getElementById("chat");
 
-  if (!inputEl || !chatBox) {
-    console.error("Missing HTML elements");
-    return;
-  }
-
   const input = inputEl.value.trim();
   if (!input) return;
 
   chatBox.innerHTML += `<div class="user">You: ${input}</div>`;
-
   inputEl.value = "";
 
   try {
