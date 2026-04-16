@@ -1,128 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PhenilRoopa.ai — Your Personal AI Assistant</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="style.css"/>
+  <title>AI Chat</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    #chat { height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; }
+    .user { color: blue; margin: 5px 0; }
+    .bot { color: green; margin: 5px 0; }
+  </style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <div class="nav-inner">
-      <div class="logo">
-        <span class="logo-icon">✦</span>
-        <span class="logo-text">PhenilRoopa<span class="logo-dot">.ai</span></span>
-      </div>
-      <div class="nav-links">
-        <a href="#chat">Chat</a>
-        <a href="#about">About</a>
-        <a href="https://github.com" target="_blank" class="btn-github">GitHub ↗</a>
-      </div>
-    </div>
-  </nav>
+<h2>My AI Chat</h2>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-content">
-      <div class="badge">Powered by Claude AI — Free to Use</div>
-      <h1>Your Intelligent<br/><span class="gradient-text">AI Companion</span></h1>
-      <p class="hero-sub">Ask anything. Explore everything. PhenilRoopa.ai brings the power of AI directly to you — no cost, no limits.</p>
-      <a href="#chat" class="cta-btn">Start Chatting ↓</a>
-    </div>
-    <div class="hero-visual">
-      <div class="orb orb1"></div>
-      <div class="orb orb2"></div>
-      <div class="orb orb3"></div>
-    </div>
-  </section>
+<div id="chat"></div>
 
-  <!-- CHAT SECTION -->
-  <section class="chat-section" id="chat">
-    <div class="chat-container">
-      <div class="chat-header">
-        <span class="status-dot"></span>
-        <span>PhenilRoopa.ai is online</span>
-      </div>
+<input id="message" type="text" placeholder="Type message..." />
+<button onclick="sendMessage()">Send</button>
 
-      <div class="chat-messages" id="messages">
-        <div class="msg ai-msg">
-          <div class="msg-avatar">AI</div>
-          <div class="msg-bubble">
-            👋 Hello! I'm <strong>PhenilRoopa.ai</strong> — your intelligent assistant. Ask me anything — code, recipes, stories, math, general knowledge, or just a fun chat!
-          </div>
-        </div>
-      </div>
+<script src="script.js"></script>
 
-      <div class="chat-input-area">
-        <textarea id="userInput" placeholder="Ask me anything..." rows="1"></textarea>
-        <button id="sendBtn" onclick="sendMessage()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round"/>
-            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="chat-footer">
-        <span>Powered by Claude AI via Secure Backend</span>
-        <span id="tokenCount">Tokens: 0</span>
-      </div>
-    </div>
-
-    <!-- Quick Prompts -->
-    <div class="quick-prompts">
-      <p>Try asking:</p>
-      <div class="prompts-grid">
-        <button onclick="quickPrompt('Write a poem about the ocean')">🌊 Write a poem</button>
-        <button onclick="quickPrompt('Explain quantum physics simply')">⚛️ Explain quantum physics</button>
-        <button onclick="quickPrompt('Give me a JavaScript tutorial')">💻 JS tutorial</button>
-        <button onclick="quickPrompt('What are healthy breakfast ideas?')">🥗 Healthy breakfast</button>
-        <button onclick="quickPrompt('Tell me a funny joke')">😄 Tell a joke</button>
-        <button onclick="quickPrompt('Help me write a resume')">📄 Write a resume</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ABOUT SECTION -->
-  <section class="about-section" id="about">
-    <div class="about-inner">
-      <h2>Why PhenilRoopa.ai?</h2>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">🆓</div>
-          <h3>100% Free</h3>
-          <p>Powered by Claude AI with a secure backend — no API key needed from users.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">⚡</div>
-          <h3>Lightning Fast</h3>
-          <p>Claude Haiku delivers rapid responses even for complex questions.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🔒</div>
-          <h3>Secure</h3>
-          <p>API keys are stored safely on the server — never exposed to the browser.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🌐</div>
-          <h3>Open Source</h3>
-          <p>Fully open source on GitHub. Modify, deploy, and share freely.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    <p>Built with ❤️ by PhenilRoopa &nbsp;|&nbsp; Powered by Claude AI &nbsp;|&nbsp;
-      <a href="https://github.com" target="_blank">View on GitHub ↗</a>
-    </p>
-  </footer>
-
-  <script src="script.js"></script>
 </body>
 </html>
