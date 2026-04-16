@@ -4,6 +4,11 @@ async function sendMessage() {
   const inputEl = document.getElementById("message");
   const chatBox = document.getElementById("chat");
 
+  if (!inputEl || !chatBox) {
+    console.error("Missing HTML elements: message or chat");
+    return;
+  }
+
   const input = inputEl.value.trim();
   if (!input) return;
 
@@ -15,9 +20,7 @@ async function sendMessage() {
   try {
     const res = await fetch(BACKEND_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: input })
     });
 
