@@ -2,23 +2,15 @@
 <html>
 <head>
   <title>AI Chat</title>
-  <style>
-    body { font-family: Arial; padding: 20px; }
-    #chat { height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; }
-    .user { color: blue; margin: 5px 0; }
-    .bot { color: green; margin: 5px 0; }
-  </style>
 </head>
 <body>
 
-<h2>My AI Chat</h2>
+  <div id="chat"></div>
 
-<div id="chat"></div>
+  <input type="text" id="message" placeholder="Type message..." />
+  <button onclick="sendMessage()">Send</button>
 
-<input id="message" type="text" placeholder="Type message..." />
-<button onclick="sendMessage()">Send</button>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 
 </body>
 </html>
