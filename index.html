@@ -49,10 +49,7 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 18px; color: white;
     }
-    .header-info h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 17px; font-weight: 700;
-    }
+    .header-info h1 { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; }
     .header-info p { font-size: 12px; color: var(--muted); }
     .dot {
       width: 8px; height: 8px; border-radius: 50%;
@@ -79,15 +76,9 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 32px;
     }
-    .welcome h2 {
-      font-family: 'Syne', sans-serif;
-      font-size: 22px; font-weight: 700;
-    }
+    .welcome h2 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; }
     .welcome p { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 300px; }
-    .suggestions {
-      display: flex; flex-wrap: wrap;
-      justify-content: center; gap: 8px; margin-top: 8px;
-    }
+    .suggestions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 8px; }
     .suggestion {
       background: var(--surface2);
       border: 1px solid var(--border);
@@ -145,11 +136,7 @@
       0%,60%,100% { transform: translateY(0); opacity: 0.4; }
       30% { transform: translateY(-6px); opacity: 1; }
     }
-    #input-bar {
-      padding: 14px 20px 20px;
-      border-top: 1px solid var(--border);
-      flex-shrink: 0;
-    }
+    #input-bar { padding: 14px 20px 20px; border-top: 1px solid var(--border); flex-shrink: 0; }
     .input-wrap {
       display: flex; align-items: flex-end; gap: 10px;
       background: var(--surface2);
@@ -199,10 +186,10 @@
         <h2>Hi, I'm PhenilRoopa</h2>
         <p>Your AI assistant. Ask me anything!</p>
         <div class="suggestions">
-          <div class="suggestion" onclick="quickSend(this)">Write a poem 🎵</div>
-          <div class="suggestion" onclick="quickSend(this)">Explain AI simply</div>
-          <div class="suggestion" onclick="quickSend(this)">Tell me a joke 😄</div>
-          <div class="suggestion" onclick="quickSend(this)">Help me code</div>
+          <div class="suggestion" onclick="quickSend('Write me a short poem')">Write a poem</div>
+          <div class="suggestion" onclick="quickSend('Explain AI in simple terms')">Explain AI simply</div>
+          <div class="suggestion" onclick="quickSend('Tell me a funny joke')">Tell me a joke</div>
+          <div class="suggestion" onclick="quickSend('Help me write some code')">Help me code</div>
         </div>
       </div>
     </div>
@@ -218,7 +205,6 @@
   </div>
 
   <script>
-    // ✅ CHANGE THIS to your Render backend URL
     const BACKEND_URL = 'https://phenilroopa-backend.onrender.com/chat';
 
     let chatHistory = [];
@@ -239,8 +225,8 @@
       }
     });
 
-    function quickSend(el) {
-      input.value = el.textContent.replace(/[^\w\s]/g, '').trim();
+    function quickSend(text) {
+      input.value = text;
       sendMessage();
     }
 
@@ -252,14 +238,14 @@
     function appendMsg(role, text, isError = false) {
       removeWelcome();
       const row = document.createElement('div');
-      row.className = `msg-row ${role}`;
+      row.className = 'msg-row ' + role;
 
       const av = document.createElement('div');
-      av.className = `avatar ${role === 'user' ? 'user-av' : 'bot-av'}`;
+      av.className = 'avatar ' + (role === 'user' ? 'user-av' : 'bot-av');
       av.textContent = role === 'user' ? 'U' : '✦';
 
       const bubble = document.createElement('div');
-      bubble.className = `bubble ${isError ? 'error' : role}`;
+      bubble.className = 'bubble ' + (isError ? 'error' : role);
       bubble.textContent = text;
 
       row.appendChild(av);
@@ -317,11 +303,11 @@
           chatHistory.push({ role: 'user', content: text });
           chatHistory.push({ role: 'assistant', content: data.reply });
         } else {
-          appendMsg('bot', '⚠ Error: ' + (data.details || data.error || 'Unknown error'), true);
+          appendMsg('bot', 'Error: ' + (data.details || data.error || 'Unknown error from backend'), true);
         }
       } catch (err) {
         hideTyping();
-        appendMsg('bot', '⚠ Could not reach the backend. Is it running on Render?', true);
+        appendMsg('bot', 'Could not reach the backend. Make sure your Render service is running and the URL is correct.', true);
         console.error(err);
       } finally {
         isLoading = false;
