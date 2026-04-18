@@ -351,6 +351,37 @@
     }
     .demo-chip:hover { border-color: var(--accent); color: var(--accent2); }
 
+    /* ── BOT MESSAGE FORMATTING ── */
+    .bot-bubble ol {
+      margin: 6px 0 0 0;
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .bot-bubble ol li {
+      padding-left: 4px;
+      line-height: 1.6;
+    }
+    .bot-bubble p {
+      margin: 0 0 6px 0;
+    }
+    .bot-bubble p:last-child {
+      margin-bottom: 0;
+    }
+    .bot-bubble ul {
+      margin: 6px 0 0 0;
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      list-style: disc;
+    }
+    .bot-bubble ul li {
+      padding-left: 4px;
+      line-height: 1.6;
+    }
+
     /* ── TESTIMONIALS ── */
     .testimonial-card {
       background: var(--surface);
@@ -780,18 +811,87 @@
     demoSend();
   }
 
+  /* ── HTML escape to prevent XSS ── */
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /* ── Format bot reply: numbered lists, bullet lists, paragraphs ── */
+  function formatBotMessage(text) {
+    const lines = text.split('\n');
+    let html = '';
+    let listType = null; // 'ol' or 'ul'
+
+    function closeList() {
+      if (listType) {
+        html += '</' + listType + '>';
+        listType = null;
+      }
+    }
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const trimmed = line.trim();
+
+      // Numbered list: "1. item" or "1) item"
+      const numberedMatch = trimmed.match(/^(\d+)[.)]\s+(.+)/);
+      // Bullet list: "- item" or "* item" or "• item"
+      const bulletMatch = trimmed.match(/^[-*•]\s+(.+)/);
+
+      if (numberedMatch) {
+        if (listType !== 'ol') {
+          closeList();
+          html += '<ol>';
+          listType = 'ol';
+        }
+        html += '<li>' + escapeHtml(numberedMatch[2]) + '</li>';
+      } else if (bulletMatch) {
+        if (listType !== 'ul') {
+          closeList();
+          html += '<ul>';
+          listType = 'ul';
+        }
+        html += '<li>' + escapeHtml(bulletMatch[1]) + '</li>';
+      } else {
+        closeList();
+        if (trimmed !== '') {
+          html += '<p>' + escapeHtml(trimmed) + '</p>';
+        }
+      }
+    }
+
+    closeList();
+    return html;
+  }
+
+  /* ── Add a message bubble to the demo ── */
   function addDemoMsg(role, text, isError) {
     const row = document.createElement('div');
     row.className = 'chat-msg' + (role === 'user' ? ' user' : '');
+
     const av = document.createElement('div');
     av.className = 'chat-av ' + (role === 'user' ? 'user-av-sm' : 'bot-av-sm');
     av.style.cssText = 'width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0;';
     av.textContent = role === 'user' ? 'U' : '✦';
+
     const bubble = document.createElement('div');
-    bubble.className = 'chat-bubble ' + (isError ? 'bot-bubble' : (role === 'user' ? 'user-bubble' : 'bot-bubble'));
+    bubble.className = 'chat-bubble ' + (role === 'user' ? 'user-bubble' : 'bot-bubble');
     if (isError) bubble.style.color = '#fca5a5';
-    bubble.textContent = text;
-    row.appendChild(av); row.appendChild(bubble);
+
+    if (role === 'bot' && !isError) {
+      // Use rich HTML formatting for bot replies
+      bubble.innerHTML = formatBotMessage(text);
+    } else {
+      // Plain text for user messages and errors
+      bubble.textContent = text;
+    }
+
+    row.appendChild(av);
+    row.appendChild(bubble);
     demoMsgs.appendChild(row);
     demoMsgs.scrollTop = demoMsgs.scrollHeight;
   }
