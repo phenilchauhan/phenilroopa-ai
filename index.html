@@ -2,148 +2,959 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PhenilRoopa.ai</title>
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PhenilRoopa.ai — Your AI Assistant</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
-    body { background:#0d0d14; color:#fff; font-family:sans-serif; }
-    .chat-box { max-width:600px; margin:50px auto; }
-    .chat-msg { display:flex; margin-bottom:10px; }
-    .chat-msg.user { justify-content:flex-end; }
-    .bubble {
-      padding:10px 14px;
-      border-radius:10px;
-      max-width:75%;
+    :root {
+      --bg: #0d0d14;
+      --surface: #13131e;
+      --surface2: #1a1a28;
+      --surface3: #20202f;
+      --border: rgba(255,255,255,0.07);
+      --accent: #7c5cfc;
+      --accent2: #a78bfa;
+      --accent-soft: rgba(124,92,252,0.12);
+      --text: #f0eeff;
+      --muted: #8880a8;
+      --green: #4ade80;
     }
-    .user .bubble { background:#7c5cfc; }
-    .bot .bubble { background:#1a1a28; border:1px solid #333; }
-    .typing { font-size:12px; opacity:0.6; }
-    input { background:#1a1a28; border:1px solid #333; color:#fff; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,13,20,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+    }
+    .nav-brand {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px; font-weight: 800;
+      color: var(--text); text-decoration: none;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-logo {
+      width: 32px; height: 32px; border-radius: 9px;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; color: #fff;
+    }
+    .nav-link-custom {
+      color: var(--muted); text-decoration: none;
+      font-size: 14px; font-weight: 500;
+      transition: color 0.2s;
+      padding: 6px 14px;
+    }
+    .nav-link-custom:hover { color: var(--text); }
+    .btn-nav {
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 10px;
+      padding: 8px 20px; font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-nav:hover { background: var(--accent2); transform: scale(1.03); color: #fff; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 92vh;
+      display: flex; align-items: center;
+      padding: 80px 0 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -200px; left: 50%;
+      transform: translateX(-50%);
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(124,92,252,0.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(124,92,252,0.25);
+      border-radius: 100px; padding: 6px 16px;
+      font-size: 13px; color: var(--accent2);
+      margin-bottom: 28px;
+      animation: fadeUp 0.6s ease both;
+    }
+    .status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green); box-shadow: 0 0 5px var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; } 50% { opacity: 0.4; }
+    }
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(42px, 6vw, 76px);
+      font-weight: 800; line-height: 1.07;
+      letter-spacing: -0.02em;
+      animation: fadeUp 0.7s ease 0.1s both;
+    }
+    .hero h1 span {
+      background: linear-gradient(90deg, #a78bfa, #7c5cfc);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-sub {
+      font-size: 18px; color: var(--muted);
+      line-height: 1.7; max-width: 480px;
+      margin-top: 20px;
+      animation: fadeUp 0.7s ease 0.2s both;
+    }
+    .hero-actions {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      margin-top: 36px;
+      animation: fadeUp 0.7s ease 0.3s both;
+    }
+    .btn-primary-custom {
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 12px;
+      padding: 14px 28px; font-size: 15px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-primary-custom:hover { background: var(--accent2); transform: translateY(-2px); color: #fff; }
+    .btn-ghost {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 14px 28px; font-size: 15px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500; cursor: pointer;
+      transition: border-color 0.2s, transform 0.15s;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-ghost:hover { border-color: var(--accent2); transform: translateY(-2px); color: var(--text); }
+    .hero-visual {
+      animation: fadeUp 0.8s ease 0.2s both;
+    }
+
+    /* ── CHAT PREVIEW ── */
+    .chat-preview {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      max-width: 460px;
+    }
+    .chat-topbar {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 18px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .chat-avatar {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: #fff;
+    }
+    .chat-topbar-info strong { font-size: 14px; font-weight: 600; display: block; }
+    .chat-topbar-info span { font-size: 11px; color: var(--muted); }
+    .chat-body { padding: 20px 18px; display: flex; flex-direction: column; gap: 14px; }
+    .chat-msg { display: flex; gap: 10px; }
+    .chat-msg.user { flex-direction: row-reverse; }
+    .chat-av {
+      width: 28px; height: 28px; border-radius: 7px;
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-family: 'Syne', sans-serif; font-weight: 700;
+    }
+    .bot-av-sm { background: var(--accent); color: #fff; }
+    .user-av-sm { background: rgba(255,255,255,0.08); color: var(--text); }
+    .chat-bubble {
+      padding: 10px 14px; font-size: 13.5px;
+      line-height: 1.6; max-width: 78%;
+      word-break: break-word;
+    }
+    .bot-bubble {
+      background: var(--surface2); color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 4px 14px 14px 14px;
+    }
+    .user-bubble {
+      background: var(--accent); color: #fff;
+      border-radius: 14px 4px 14px 14px;
+    }
+    .typing-dots {
+      display: flex; gap: 4px; align-items: center;
+      padding: 12px 14px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 4px 14px 14px 14px; width: fit-content;
+    }
+    .typing-dots span {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--muted);
+      animation: bounce 1.2s infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    /* ── STATS ── */
+    .stats-bar {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      padding: 36px 0;
+    }
+    .stat-item { text-align: center; }
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 36px; font-weight: 800;
+      color: var(--text);
+    }
+    .stat-num span { color: var(--accent2); }
+    .stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    /* ── FEATURES ── */
+    .section { padding: 90px 0; }
+    .section-label {
+      font-size: 12px; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent2);
+      font-weight: 500; margin-bottom: 14px;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800; line-height: 1.15;
+    }
+    .section-sub { font-size: 16px; color: var(--muted); line-height: 1.7; margin-top: 14px; }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 30px 28px;
+      height: 100%;
+      transition: border-color 0.3s, transform 0.3s;
+      cursor: default;
+    }
+    .feature-card:hover {
+      border-color: rgba(124,92,252,0.35);
+      transform: translateY(-4px);
+    }
+    .feature-icon {
+      width: 48px; height: 48px; border-radius: 13px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(124,92,252,0.2);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+    }
+    .feature-icon svg { width: 22px; height: 22px; }
+    .feature-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px; font-weight: 700; margin-bottom: 10px;
+    }
+    .feature-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+    /* ── HOW IT WORKS ── */
+    .how-bg { background: var(--surface); }
+    .step-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 48px; font-weight: 800;
+      color: rgba(124,92,252,0.15);
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+    .step-card {
+      padding: 32px 28px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--surface2);
+      height: 100%;
+      transition: border-color 0.3s;
+    }
+    .step-card:hover { border-color: rgba(124,92,252,0.3); }
+    .step-card h4 {
+      font-family: 'Syne', sans-serif;
+      font-size: 17px; font-weight: 700; margin-bottom: 10px;
+    }
+    .step-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+    /* ── LIVE DEMO ── */
+    .demo-section { background: var(--surface2); }
+    .demo-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .demo-header {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .demo-header strong { font-family: 'Syne', sans-serif; font-size: 15px; }
+    .demo-messages {
+      padding: 24px 20px;
+      display: flex; flex-direction: column; gap: 16px;
+      min-height: 280px; max-height: 340px; overflow-y: auto;
+    }
+    .demo-input-bar {
+      border-top: 1px solid var(--border);
+      padding: 14px 16px;
+      display: flex; gap: 10px;
+    }
+    .demo-input {
+      flex: 1; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 10px 14px; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 14px;
+      outline: none; transition: border-color 0.2s;
+    }
+    .demo-input::placeholder { color: var(--muted); }
+    .demo-input:focus { border-color: rgba(124,92,252,0.5); }
+    .demo-send {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--accent); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, transform 0.15s;
+      flex-shrink: 0;
+    }
+    .demo-send:hover { background: var(--accent2); transform: scale(1.05); }
+    .demo-send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .demo-send svg { width: 16px; height: 16px; fill: #fff; }
+    .demo-chips {
+      padding: 0 20px 16px;
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .demo-chip {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 6px 14px;
+      font-size: 12px; color: var(--muted);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .demo-chip:hover { border-color: var(--accent); color: var(--accent2); }
+
+    /* ── BOT MESSAGE FORMATTING ── */
+    .bot-bubble ol {
+      margin: 6px 0 0 0;
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .bot-bubble ol li {
+      padding-left: 4px;
+      line-height: 1.6;
+    }
+    .bot-bubble p {
+      margin: 0 0 6px 0;
+    }
+    .bot-bubble p:last-child {
+      margin-bottom: 0;
+    }
+    .bot-bubble ul {
+      margin: 6px 0 0 0;
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      list-style: disc;
+    }
+    .bot-bubble ul li {
+      padding-left: 4px;
+      line-height: 1.6;
+    }
+
+    /* ── TESTIMONIALS ── */
+    .testimonial-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px 26px;
+      height: 100%;
+    }
+    .stars { color: #f59e0b; font-size: 14px; margin-bottom: 14px; letter-spacing: 2px; }
+    .testimonial-text { font-size: 14.5px; color: var(--muted); line-height: 1.75; margin-bottom: 20px; }
+    .testimonial-author { display: flex; align-items: center; gap: 12px; }
+    .t-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; font-family: 'Syne', sans-serif;
+    }
+    .t-name { font-size: 14px; font-weight: 600; }
+    .t-role { font-size: 12px; color: var(--muted); }
+
+    /* ── CTA ── */
+    .cta-section {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 90px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse, rgba(124,92,252,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-section h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 800; margin-bottom: 16px;
+    }
+    .cta-section p { font-size: 16px; color: var(--muted); max-width: 420px; margin: 0 auto 36px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 40px 0 28px;
+    }
+    .footer-brand {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px; font-weight: 800;
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 10px;
+    }
+    .footer-copy { font-size: 13px; color: var(--muted); }
+    .footer-link { color: var(--muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+    .footer-link:hover { color: var(--accent2); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .hero { padding: 60px 0 40px; min-height: auto; }
+      .hero-visual { margin-top: 40px; }
+      .chat-preview { max-width: 100%; }
+    }
   </style>
 </head>
-
 <body>
 
-<div class="chat-box">
-  <h4>PhenilRoopa AI</h4>
+<!-- ── NAV ── -->
+<nav>
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="#" class="nav-brand">
+        <div class="nav-logo">✦</div>
+        PhenilRoopa.ai
+      </a>
+      <div class="d-none d-md-flex align-items-center gap-1">
+        <a href="#features" class="nav-link-custom">Features</a>
+        <a href="#how" class="nav-link-custom">How it works</a>
+        <a href="#demo" class="nav-link-custom">Try it</a>
+        <a href="index.html" class="btn-nav ms-3">Open Chat</a>
+      </div>
+      <a href="index.html" class="btn-nav d-md-none">Open Chat</a>
+    </div>
+  </div>
+</nav>
 
-  <div id="messages"></div>
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <div class="hero-badge">
+          <div class="status-dot"></div>
+          Powered by Llama 3.3 · Groq
+        </div>
+        <h1>Meet your AI<br /><span>thinking partner</span></h1>
+        <p class="hero-sub">PhenilRoopa is a blazing-fast AI assistant built on Groq's inference engine. Ask anything — it thinks in milliseconds.</p>
+        <div class="hero-actions">
+          <a href="#demo" class="btn-primary-custom">Try it free →</a>
+          <a href="#how" class="btn-ghost">See how it works</a>
+        </div>
+      </div>
+      <div class="col-lg-6 hero-visual">
+        <div class="chat-preview ms-lg-auto">
+          <div class="chat-topbar">
+            <div class="chat-avatar">✦</div>
+            <div class="chat-topbar-info">
+              <strong>PhenilRoopa</strong>
+              <span>AI · Always available</span>
+            </div>
+            <div class="ms-auto d-flex align-items-center gap-2">
+              <div class="status-dot"></div>
+              <span style="font-size:12px; color:var(--green)">Online</span>
+            </div>
+          </div>
+          <div class="chat-body">
+            <div class="chat-msg">
+              <div class="chat-av bot-av-sm">✦</div>
+              <div class="chat-bubble bot-bubble">Hello! I'm PhenilRoopa, your AI assistant. What would you like to explore today?</div>
+            </div>
+            <div class="chat-msg user">
+              <div class="chat-av user-av-sm">U</div>
+              <div class="chat-bubble user-bubble">Explain quantum computing in simple terms</div>
+            </div>
+            <div class="chat-msg">
+              <div class="chat-av bot-av-sm">✦</div>
+              <div class="chat-bubble bot-bubble">Quantum computing uses quantum bits (qubits) that can be 0 and 1 simultaneously — unlike regular bits. This lets quantum computers solve certain problems exponentially faster. Think of it like trying every path of a maze at once instead of one at a time.</div>
+            </div>
+            <div class="chat-msg">
+              <div class="chat-av bot-av-sm">✦</div>
+              <div class="typing-dots"><span></span><span></span><span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <div class="d-flex mt-3 gap-2">
-    <input id="input" class="form-control" placeholder="Ask something..." />
-    <button onclick="send()" class="btn btn-primary">Send</button>
+<!-- ── STATS ── -->
+<div class="stats-bar">
+  <div class="container">
+    <div class="row g-4 text-center">
+      <div class="col-6 col-md-3 fade-up">
+        <div class="stat-num">~<span>30</span>ms</div>
+        <div class="stat-label">Average response time</div>
+      </div>
+      <div class="col-6 col-md-3 fade-up">
+        <div class="stat-num"><span>70B</span></div>
+        <div class="stat-label">Parameter model</div>
+      </div>
+      <div class="col-6 col-md-3 fade-up">
+        <div class="stat-num"><span>∞</span></div>
+        <div class="stat-label">Topics covered</div>
+      </div>
+      <div class="col-6 col-md-3 fade-up">
+        <div class="stat-num"><span>24</span>/7</div>
+        <div class="stat-label">Always online</div>
+      </div>
+    </div>
   </div>
 </div>
 
+<!-- ── FEATURES ── -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="text-center mb-5 fade-up">
+      <div class="section-label">Capabilities</div>
+      <h2 class="section-title">Everything you need from an AI</h2>
+      <p class="section-sub mx-auto" style="max-width:480px">From creative writing to coding to research — PhenilRoopa handles it all with speed and precision.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4 fade-up">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <h3>Lightning fast</h3>
+          <p>Groq's custom inference hardware delivers responses in under 100ms. No more waiting — just instant answers.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 fade-up">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </div>
+          <h3>Creative writing</h3>
+          <p>Poems, stories, essays, emails — PhenilRoopa writes with style, adapting tone and voice to your needs.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 fade-up">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <h3>Code assistance</h3>
+          <p>Debug, explain, refactor, and generate code across every major language. Your pair programmer is here.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 fade-up">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          </div>
+          <h3>Memory in conversation</h3>
+          <p>Context is maintained throughout the chat — PhenilRoopa remembers what you said earlier in the session.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 fade-up">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          </div>
+          <h3>Natural conversation</h3>
+          <p>Chat just like you would with a knowledgeable friend. No commands, no syntax — just plain language.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 fade-up">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
+          <h3>Private & secure</h3>
+          <p>Your conversations are yours alone. No data sold, no profiles built. Just a clean, private AI experience.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section class="section how-bg" id="how">
+  <div class="container">
+    <div class="text-center mb-5 fade-up">
+      <div class="section-label">Process</div>
+      <h2 class="section-title">How it works</h2>
+      <p class="section-sub mx-auto" style="max-width:420px">Three simple steps from question to answer.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4 fade-up">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <h4>Type your question</h4>
+          <p>Write anything — a question, a task, a creative prompt. There's no right or wrong way to ask.</p>
+        </div>
+      </div>
+      <div class="col-md-4 fade-up">
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <h4>Groq processes it</h4>
+          <p>Your message reaches Groq's inference engine which runs Llama 3.3 70B at extraordinary speed.</p>
+        </div>
+      </div>
+      <div class="col-md-4 fade-up">
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <h4>Instant reply</h4>
+          <p>PhenilRoopa delivers a thoughtful, accurate response — usually in under a second. Keep the conversation going.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── LIVE DEMO ── -->
+<section class="section demo-section" id="demo">
+  <div class="container">
+    <div class="text-center mb-5 fade-up">
+      <div class="section-label">Live demo</div>
+      <h2 class="section-title">Try it right here</h2>
+      <p class="section-sub mx-auto" style="max-width:420px">No sign-up needed. Chat with PhenilRoopa directly on this page.</p>
+    </div>
+    <div class="row justify-content-center fade-up">
+      <div class="col-lg-8">
+        <div class="demo-wrap">
+          <div class="demo-header">
+            <div class="chat-avatar" style="width:30px;height:30px;font-size:13px;">✦</div>
+            <strong>PhenilRoopa.ai</strong>
+            <div class="ms-auto d-flex align-items-center gap-2">
+              <div class="status-dot"></div>
+              <span style="font-size:12px;color:var(--green)">Live</span>
+            </div>
+          </div>
+          <div class="demo-messages" id="demo-msgs">
+            <div class="chat-msg">
+              <div class="chat-av bot-av-sm" style="width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0;">✦</div>
+              <div class="chat-bubble bot-bubble">Hi! I'm PhenilRoopa. Ask me anything — I'm powered by Llama 3.3 on Groq and respond instantly.</div>
+            </div>
+          </div>
+          <div class="demo-chips" id="demo-chips">
+            <div class="demo-chip" onclick="demoChip(this)">Write a haiku about code</div>
+            <div class="demo-chip" onclick="demoChip(this)">What is machine learning?</div>
+            <div class="demo-chip" onclick="demoChip(this)">Tell me a fun fact</div>
+            <div class="demo-chip" onclick="demoChip(this)">Help me brainstorm startup ideas</div>
+          </div>
+          <div class="demo-input-bar">
+            <input type="text" class="demo-input" id="demo-input" placeholder="Ask me anything..." />
+            <button class="demo-send" id="demo-send" onclick="demoSend()">
+              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ── -->
+<section class="section" id="testimonials">
+  <div class="container">
+    <div class="text-center mb-5 fade-up">
+      <div class="section-label">What people say</div>
+      <h2 class="section-title">Built for real people</h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4 fade-up">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">"PhenilRoopa helped me debug a nasty React bug in minutes. Explained the issue clearly and gave me working code. Incredible speed."</p>
+          <div class="testimonial-author">
+            <div class="t-avatar" style="background:rgba(124,92,252,0.15);color:#a78bfa;">AK</div>
+            <div>
+              <div class="t-name">Arjun K.</div>
+              <div class="t-role">Frontend Developer</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 fade-up">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">"I use it every day for writing emails and summarizing research. The responses are thoughtful and genuinely helpful — not just filler."</p>
+          <div class="testimonial-author">
+            <div class="t-avatar" style="background:rgba(29,158,117,0.15);color:#5DCAA5;">SM</div>
+            <div>
+              <div class="t-name">Sneha M.</div>
+              <div class="t-role">Product Manager</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 fade-up">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">"As a student, having an AI that explains complex topics simply is game-changing. PhenilRoopa is my favourite study tool by far."</p>
+          <div class="testimonial-author">
+            <div class="t-avatar" style="background:rgba(216,90,48,0.15);color:#F0997B;">RD</div>
+            <div>
+              <div class="t-name">Rohan D.</div>
+              <div class="t-role">Engineering Student</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section class="cta-section">
+  <div class="container position-relative">
+    <h2>Ready to think faster?</h2>
+    <p>Join thousands of people already using PhenilRoopa to work smarter every day.</p>
+    <a href="index.html" class="btn-primary-custom" style="font-size:16px;padding:16px 36px;">Start chatting — it's free</a>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="container">
+    <div class="row align-items-center g-3">
+      <div class="col-md-5">
+        <div class="footer-brand">
+          <div class="nav-logo">✦</div>
+          PhenilRoopa.ai
+        </div>
+        <p class="footer-copy">Powered by Llama 3.3 · Groq inference · Built with love</p>
+      </div>
+      <div class="col-md-7">
+        <div class="d-flex gap-4 justify-content-md-end flex-wrap">
+          <a href="#features" class="footer-link">Features</a>
+          <a href="#how" class="footer-link">How it works</a>
+          <a href="#demo" class="footer-link">Try it</a>
+          <a href="https://github.com/phenilchauhan/phenilroopa-backend" class="footer-link">GitHub</a>
+          <a href="https://console.groq.com" class="footer-link">Groq</a>
+        </div>
+      </div>
+    </div>
+    <div class="mt-4 pt-4" style="border-top:1px solid var(--border);">
+      <p class="footer-copy text-center">© 2025 PhenilRoopa.ai · Made by Phenil Chauhan</p>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-const BACKEND = "https://phenilroopa-backend.onrender.com/chat";
+  const BACKEND = 'https://phenilroopa-backend.onrender.com/chat';
+  let demoHistory = [];
+  let demoLoading = false;
 
-let history = [];
-let loading = false;
+  const demoInput = document.getElementById('demo-input');
+  const demoSendBtn = document.getElementById('demo-send');
+  const demoMsgs = document.getElementById('demo-msgs');
 
-const input = document.getElementById("input");
-const messages = document.getElementById("messages");
+  demoInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); demoSend(); }
+  });
 
-input.addEventListener("keydown", e => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    send();
+  function demoChip(el) {
+    demoInput.value = el.textContent;
+    demoSend();
   }
-});
 
-function addMsg(role, text, error=false) {
-  const div = document.createElement("div");
-  div.className = "chat-msg " + role;
+  /* ── HTML escape to prevent XSS ── */
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
 
-  const bubble = document.createElement("div");
-  bubble.className = "bubble";
+  /* ── Format bot reply: numbered lists, bullet lists, paragraphs ── */
+  function formatBotMessage(text) {
+    const lines = text.split('\n');
+    let html = '';
+    let listType = null; // 'ol' or 'ul'
 
-  if(error) bubble.style.color = "red";
-
-  bubble.textContent = text;
-
-  div.appendChild(bubble);
-  messages.appendChild(div);
-
-  setTimeout(() => {
-    messages.scrollTop = messages.scrollHeight;
-  }, 50);
-}
-
-function typingShow() {
-  const t = document.createElement("div");
-  t.id = "typing";
-  t.className = "typing";
-  t.innerText = "AI is typing...";
-  messages.appendChild(t);
-}
-
-function typingHide() {
-  const t = document.getElementById("typing");
-  if (t) t.remove();
-}
-
-async function send() {
-  if (loading) return;
-
-  const text = input.value.trim();
-  if (!text) return;
-
-  addMsg("user", text);
-
-  input.value = "";
-  input.disabled = true;
-  loading = true;
-
-  typingShow();
-
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
-
-    const start = performance.now();
-
-    const res = await fetch(BACKEND, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text, history }),
-      signal: controller.signal
-    });
-
-    clearTimeout(timeout);
-
-    const data = await res.json();
-
-    typingHide();
-
-    if (data.reply) {
-      const end = performance.now();
-      const time = Math.round(end - start);
-
-      let reply = data.reply.substring(0, 5000); // limit
-
-      addMsg("bot", reply + "\n\n⚡ " + time + "ms");
-
-      history.push({ role: "user", content: text });
-      history.push({ role: "assistant", content: reply });
-
-    } else {
-      addMsg("bot", "Error: " + (data.error || "Unknown"), true);
+    function closeList() {
+      if (listType) {
+        html += '</' + listType + '>';
+        listType = null;
+      }
     }
 
-  } catch (err) {
-    typingHide();
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const trimmed = line.trim();
 
-    addMsg("bot", "⚠️ Server waking up... try again in 5 seconds.", true);
+      // Numbered list: "1. item" or "1) item"
+      const numberedMatch = trimmed.match(/^(\d+)[.)]\s+(.+)/);
+      // Bullet list: "- item" or "* item" or "• item"
+      const bulletMatch = trimmed.match(/^[-*•]\s+(.+)/);
+
+      if (numberedMatch) {
+        if (listType !== 'ol') {
+          closeList();
+          html += '<ol>';
+          listType = 'ol';
+        }
+        html += '<li>' + escapeHtml(numberedMatch[2]) + '</li>';
+      } else if (bulletMatch) {
+        if (listType !== 'ul') {
+          closeList();
+          html += '<ul>';
+          listType = 'ul';
+        }
+        html += '<li>' + escapeHtml(bulletMatch[1]) + '</li>';
+      } else {
+        closeList();
+        if (trimmed !== '') {
+          html += '<p>' + escapeHtml(trimmed) + '</p>';
+        }
+      }
+    }
+
+    closeList();
+    return html;
   }
 
-  input.disabled = false;
-  input.focus();
-  loading = false;
-}
-</script>
+  /* ── Add a message bubble to the demo ── */
+  function addDemoMsg(role, text, isError) {
+    const row = document.createElement('div');
+    row.className = 'chat-msg' + (role === 'user' ? ' user' : '');
 
+    const av = document.createElement('div');
+    av.className = 'chat-av ' + (role === 'user' ? 'user-av-sm' : 'bot-av-sm');
+    av.style.cssText = 'width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0;';
+    av.textContent = role === 'user' ? 'U' : '✦';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble ' + (role === 'user' ? 'user-bubble' : 'bot-bubble');
+    if (isError) bubble.style.color = '#fca5a5';
+
+    if (role === 'bot' && !isError) {
+      // Use rich HTML formatting for bot replies
+      bubble.innerHTML = formatBotMessage(text);
+    } else {
+      // Plain text for user messages and errors
+      bubble.textContent = text;
+    }
+
+    row.appendChild(av);
+    row.appendChild(bubble);
+    demoMsgs.appendChild(row);
+    demoMsgs.scrollTop = demoMsgs.scrollHeight;
+  }
+
+  function showDemoTyping() {
+    const row = document.createElement('div');
+    row.className = 'chat-msg'; row.id = 'demo-typing';
+    const av = document.createElement('div');
+    av.className = 'chat-av bot-av-sm';
+    av.style.cssText = 'width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0;';
+    av.textContent = '✦';
+    const dots = document.createElement('div');
+    dots.className = 'typing-dots';
+    dots.innerHTML = '<span></span><span></span><span></span>';
+    row.appendChild(av); row.appendChild(dots);
+    demoMsgs.appendChild(row);
+    demoMsgs.scrollTop = demoMsgs.scrollHeight;
+  }
+
+  function hideDemoTyping() {
+    const t = document.getElementById('demo-typing');
+    if (t) t.remove();
+  }
+
+  async function demoSend() {
+    if (demoLoading) return;
+    const text = demoInput.value.trim();
+    if (!text) return;
+    addDemoMsg('user', text);
+    demoInput.value = '';
+    demoLoading = true;
+    demoSendBtn.disabled = true;
+    document.getElementById('demo-chips').style.display = 'none';
+    showDemoTyping();
+    try {
+      const res = await fetch(BACKEND, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history: demoHistory })
+      });
+      const data = await res.json();
+      hideDemoTyping();
+      if (data.reply) {
+        addDemoMsg('bot', data.reply);
+        demoHistory.push({ role: 'user', content: text });
+        demoHistory.push({ role: 'assistant', content: data.reply });
+      } else {
+        addDemoMsg('bot', 'Error: ' + (data.details || data.error || 'Unknown error'), true);
+      }
+    } catch (err) {
+      hideDemoTyping();
+      addDemoMsg('bot', 'Could not reach the backend. Make sure Render is running.', true);
+    } finally {
+      demoLoading = false;
+      demoSendBtn.disabled = false;
+      demoInput.focus();
+    }
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
 </body>
 </html>
