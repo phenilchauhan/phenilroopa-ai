@@ -8,464 +8,302 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0d0d14;
-      --surface: #13131e;
-      --surface2: #1a1a28;
-      --surface3: #20202f;
-      --border: rgba(255,255,255,0.07);
-      --accent: #7c5cfc;
-      --accent2: #a78bfa;
-      --accent-soft: rgba(124,92,252,0.12);
-      --text: #f0eeff;
-      --muted: #8880a8;
-      --green: #4ade80;
+      --bg: #0d0d14; --surface: #13131e; --surface2: #1a1a28; --surface3: #20202f;
+      --border: rgba(255,255,255,0.07); --accent: #7c5cfc; --accent2: #a78bfa;
+      --accent-soft: rgba(124,92,252,0.12); --text: #f0eeff; --muted: #8880a8;
+      --green: #4ade80; --paytm: #00BAF2; --paytm-dark: #0088cc;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
-    }
-
-    /* ── NAV ── */
-    nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(13,13,20,0.85);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 0;
-    }
-    .nav-brand {
-      font-family: 'Syne', sans-serif;
-      font-size: 20px; font-weight: 800;
-      color: var(--text); text-decoration: none;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .nav-logo {
-      width: 32px; height: 32px; border-radius: 9px;
-      background: var(--accent);
+    /* AUTH OVERLAY */
+    #auth-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(10,10,18,0.97); backdrop-filter: blur(24px);
       display: flex; align-items: center; justify-content: center;
-      font-size: 15px; color: #fff;
     }
-    .nav-link-custom {
-      color: var(--muted); text-decoration: none;
-      font-size: 14px; font-weight: 500;
-      transition: color 0.2s;
-      padding: 6px 14px;
+    @keyframes fadeIn { from{opacity:0}to{opacity:1} }
+    @keyframes slideUp { from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)} }
+    @keyframes shake { 0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)} }
+    .auth-card {
+      background: var(--surface); border: 1px solid rgba(124,92,252,0.25);
+      border-radius: 24px; padding: 44px 38px; width: 100%; max-width: 410px; margin: 20px;
+      animation: slideUp 0.5s ease both;
+      box-shadow: 0 0 100px rgba(124,92,252,0.12), 0 40px 80px rgba(0,0,0,0.6);
     }
-    .nav-link-custom:hover { color: var(--text); }
-    .btn-nav {
-      background: var(--accent); color: #fff;
-      border: none; border-radius: 10px;
-      padding: 8px 20px; font-size: 14px;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 500; cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-      text-decoration: none; display: inline-block;
+    .auth-logo {
+      width: 54px; height: 54px; border-radius: 15px; background: var(--accent);
+      display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff;
+      margin: 0 auto 18px; box-shadow: 0 8px 24px rgba(124,92,252,0.35);
     }
-    .btn-nav:hover { background: var(--accent2); transform: scale(1.03); color: #fff; }
+    .auth-title { font-family:'Syne',sans-serif; font-size:24px; font-weight:800; text-align:center; margin-bottom:5px; }
+    .auth-subtitle { font-size:13.5px; color:var(--muted); text-align:center; margin-bottom:28px; }
+    .auth-tab-row { display:flex; background:var(--surface2); border-radius:12px; padding:4px; margin-bottom:26px; }
+    .auth-tab {
+      flex:1; padding:9px 0; text-align:center; font-size:14px; font-weight:500;
+      border-radius:9px; cursor:pointer; color:var(--muted); transition:all 0.2s;
+      border:none; background:transparent; font-family:'DM Sans',sans-serif;
+    }
+    .auth-tab.active { background:var(--accent); color:#fff; box-shadow:0 2px 14px rgba(124,92,252,0.4); }
+    .auth-panel { display:none; }
+    .auth-panel.active { display:block; }
+    .auth-form { display:flex; flex-direction:column; gap:14px; }
+    .auth-field label { display:block; font-size:11.5px; font-weight:500; color:var(--muted); margin-bottom:6px; letter-spacing:0.06em; text-transform:uppercase; }
+    .auth-field input {
+      width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:12px;
+      padding:12px 16px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px;
+      outline:none; transition:border-color 0.2s;
+    }
+    .auth-field input:focus { border-color:rgba(124,92,252,0.55); }
+    .auth-field input::placeholder { color:var(--muted); }
+    .auth-btn {
+      width:100%; background:var(--accent); color:#fff; border:none; border-radius:12px;
+      padding:14px; font-size:15px; font-family:'DM Sans',sans-serif; font-weight:500;
+      cursor:pointer; transition:background 0.2s,transform 0.15s; margin-top:4px;
+    }
+    .auth-btn:hover { background:var(--accent2); transform:translateY(-1px); }
+    .auth-err {
+      background:rgba(252,92,92,0.1); border:1px solid rgba(252,92,92,0.3);
+      border-radius:10px; padding:10px 14px; font-size:13px; color:#fca5a5; display:none; margin-bottom:8px;
+    }
+    .auth-err.show { display:block; animation:shake 0.4s ease; }
 
-    /* ── HERO ── */
-    .hero {
-      min-height: 92vh;
-      display: flex; align-items: center;
-      padding: 80px 0 60px;
-      position: relative;
-      overflow: hidden;
+    /* PAYMENT MODAL */
+    #payment-modal {
+      position:fixed; inset:0; z-index:10000;
+      background:rgba(10,10,18,0.97); backdrop-filter:blur(24px);
+      display:none; align-items:center; justify-content:center;
     }
-    .hero::before {
-      content: '';
-      position: absolute; top: -200px; left: 50%;
-      transform: translateX(-50%);
-      width: 800px; height: 800px;
-      background: radial-gradient(circle, rgba(124,92,252,0.12) 0%, transparent 65%);
-      pointer-events: none;
+    #payment-modal.show { display:flex; }
+    .payment-card {
+      background:var(--surface); border:1px solid rgba(0,186,242,0.25);
+      border-radius:24px; padding:44px 38px; width:100%; max-width:400px; margin:20px;
+      animation:slideUp 0.5s ease both; text-align:center;
+      box-shadow:0 0 100px rgba(0,186,242,0.08), 0 40px 80px rgba(0,0,0,0.6);
     }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--accent-soft);
-      border: 1px solid rgba(124,92,252,0.25);
-      border-radius: 100px; padding: 6px 16px;
-      font-size: 13px; color: var(--accent2);
-      margin-bottom: 28px;
-      animation: fadeUp 0.6s ease both;
+    .paytm-icon {
+      width:64px; height:64px; border-radius:18px;
+      background:linear-gradient(135deg,#00BAF2,#0077bb);
+      display:flex; align-items:center; justify-content:center; flex-direction:column; gap:1px;
+      margin:0 auto 18px; box-shadow:0 8px 28px rgba(0,186,242,0.3); color:#fff;
     }
-    .status-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--green); box-shadow: 0 0 5px var(--green);
-      animation: pulse 2s infinite;
+    .paytm-icon .pi1 { font-size:14px; font-weight:900; letter-spacing:0.5px; }
+    .paytm-icon .pi2 { font-size:9px; opacity:0.85; font-weight:700; }
+    .payment-title { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; margin-bottom:8px; }
+    .payment-sub { font-size:13.5px; color:var(--muted); margin-bottom:28px; line-height:1.65; }
+    .payment-box {
+      background:var(--surface2); border:1px solid rgba(0,186,242,0.18);
+      border-radius:16px; padding:22px; margin-bottom:24px;
     }
-    @keyframes pulse {
-      0%,100% { opacity: 1; } 50% { opacity: 0.4; }
+    .payment-box .lbl { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px; }
+    .payment-box .amount { font-family:'Syne',sans-serif; font-size:48px; font-weight:800; color:var(--paytm); line-height:1; }
+    .payment-box .csym { font-size:24px; vertical-align:super; }
+    .payment-box .upi { font-size:12px; color:var(--muted); margin-top:8px; }
+    .payment-box .upi span { color:var(--paytm); font-weight:600; }
+    .pay-btn {
+      display:block; width:100%; background:var(--paytm); color:#fff;
+      border:none; border-radius:12px; padding:15px; font-size:15px;
+      font-family:'DM Sans',sans-serif; font-weight:600;
+      cursor:pointer; transition:background 0.2s,transform 0.15s; text-decoration:none; margin-bottom:10px;
     }
-    .hero h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(42px, 6vw, 76px);
-      font-weight: 800; line-height: 1.07;
-      letter-spacing: -0.02em;
-      animation: fadeUp 0.7s ease 0.1s both;
-    }
-    .hero h1 span {
-      background: linear-gradient(90deg, #a78bfa, #7c5cfc);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .hero-sub {
-      font-size: 18px; color: var(--muted);
-      line-height: 1.7; max-width: 480px;
-      margin-top: 20px;
-      animation: fadeUp 0.7s ease 0.2s both;
-    }
-    .hero-actions {
-      display: flex; gap: 14px; flex-wrap: wrap;
-      margin-top: 36px;
-      animation: fadeUp 0.7s ease 0.3s both;
-    }
-    .btn-primary-custom {
-      background: var(--accent); color: #fff;
-      border: none; border-radius: 12px;
-      padding: 14px 28px; font-size: 15px;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 500; cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-      text-decoration: none; display: inline-block;
-    }
-    .btn-primary-custom:hover { background: var(--accent2); transform: translateY(-2px); color: #fff; }
-    .btn-ghost {
-      background: transparent; color: var(--text);
-      border: 1px solid var(--border); border-radius: 12px;
-      padding: 14px 28px; font-size: 15px;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 500; cursor: pointer;
-      transition: border-color 0.2s, transform 0.15s;
-      text-decoration: none; display: inline-block;
-    }
-    .btn-ghost:hover { border-color: var(--accent2); transform: translateY(-2px); color: var(--text); }
-    .hero-visual {
-      animation: fadeUp 0.8s ease 0.2s both;
-    }
+    .pay-btn:hover { background:var(--paytm-dark); transform:translateY(-1px); color:#fff; }
+    .pay-skip { font-size:13px; color:var(--muted); cursor:pointer; background:none; border:none; font-family:'DM Sans',sans-serif; text-decoration:underline; transition:color 0.2s; }
+    .pay-skip:hover { color:var(--text); }
+    .payment-note { font-size:11px; color:var(--muted); margin-top:18px; line-height:1.7; background:var(--surface2); border-radius:10px; padding:12px 14px; text-align:left; }
+    .payment-note strong { color:var(--text); }
 
-    /* ── CHAT PREVIEW ── */
-    .chat-preview {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
-      max-width: 460px;
-    }
-    .chat-topbar {
-      background: var(--surface2);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 18px;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .chat-avatar {
-      width: 32px; height: 32px; border-radius: 8px;
-      background: var(--accent);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; color: #fff;
-    }
-    .chat-topbar-info strong { font-size: 14px; font-weight: 600; display: block; }
-    .chat-topbar-info span { font-size: 11px; color: var(--muted); }
-    .chat-body { padding: 20px 18px; display: flex; flex-direction: column; gap: 14px; }
-    .chat-msg { display: flex; gap: 10px; }
-    .chat-msg.user { flex-direction: row-reverse; }
-    .chat-av {
-      width: 28px; height: 28px; border-radius: 7px;
-      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-family: 'Syne', sans-serif; font-weight: 700;
-    }
-    .bot-av-sm { background: var(--accent); color: #fff; }
-    .user-av-sm { background: rgba(255,255,255,0.08); color: var(--text); }
-    .chat-bubble {
-      padding: 10px 14px; font-size: 13.5px;
-      line-height: 1.6; max-width: 78%;
-      word-break: break-word;
-    }
-    .bot-bubble {
-      background: var(--surface2); color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 4px 14px 14px 14px;
-    }
-    .user-bubble {
-      background: var(--accent); color: #fff;
-      border-radius: 14px 4px 14px 14px;
-    }
-    .typing-dots {
-      display: flex; gap: 4px; align-items: center;
-      padding: 12px 14px;
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 4px 14px 14px 14px; width: fit-content;
-    }
-    .typing-dots span {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--muted);
-      animation: bounce 1.2s infinite;
-    }
-    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes bounce {
-      0%,60%,100% { transform: translateY(0); opacity: 0.4; }
-      30% { transform: translateY(-5px); opacity: 1; }
-    }
+    /* NAV */
+    nav { position:sticky; top:0; z-index:100; background:rgba(13,13,20,0.85); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:14px 0; }
+    .nav-brand { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:10px; }
+    .nav-logo { width:32px; height:32px; border-radius:9px; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:15px; color:#fff; }
+    .nav-link-custom { color:var(--muted); text-decoration:none; font-size:14px; font-weight:500; transition:color 0.2s; padding:6px 14px; }
+    .nav-link-custom:hover { color:var(--text); }
+    .btn-nav { background:var(--accent); color:#fff; border:none; border-radius:10px; padding:8px 20px; font-size:14px; font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer; transition:background 0.2s,transform 0.15s; text-decoration:none; display:inline-block; }
+    .btn-nav:hover { background:var(--accent2); transform:scale(1.03); color:#fff; }
+    .nav-user-pill { display:flex; align-items:center; gap:8px; background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:5px 14px 5px 8px; font-size:13px; cursor:pointer; transition:border-color 0.2s; }
+    .nav-user-pill:hover { border-color:rgba(124,92,252,0.4); }
+    .nav-av { width:24px; height:24px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; font-family:'Syne',sans-serif; }
+    .nav-out { font-size:12px; color:var(--muted); margin-left:4px; }
 
-    /* ── STATS ── */
-    .stats-bar {
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-      padding: 36px 0;
-    }
-    .stat-item { text-align: center; }
-    .stat-num {
-      font-family: 'Syne', sans-serif;
-      font-size: 36px; font-weight: 800;
-      color: var(--text);
-    }
-    .stat-num span { color: var(--accent2); }
-    .stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    /* HERO */
+    .hero { min-height:92vh; display:flex; align-items:center; padding:80px 0 60px; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; top:-200px; left:50%; transform:translateX(-50%); width:800px; height:800px; background:radial-gradient(circle,rgba(124,92,252,0.12) 0%,transparent 65%); pointer-events:none; }
+    .hero-badge { display:inline-flex; align-items:center; gap:8px; background:var(--accent-soft); border:1px solid rgba(124,92,252,0.25); border-radius:100px; padding:6px 16px; font-size:13px; color:var(--accent2); margin-bottom:28px; animation:fadeUp 0.6s ease both; }
+    .status-dot { width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 5px var(--green); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+    .hero h1 { font-family:'Syne',sans-serif; font-size:clamp(42px,6vw,76px); font-weight:800; line-height:1.07; letter-spacing:-0.02em; animation:fadeUp 0.7s ease 0.1s both; }
+    .hero h1 span { background:linear-gradient(90deg,#a78bfa,#7c5cfc); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .hero-sub { font-size:18px; color:var(--muted); line-height:1.7; max-width:480px; margin-top:20px; animation:fadeUp 0.7s ease 0.2s both; }
+    .hero-actions { display:flex; gap:14px; flex-wrap:wrap; margin-top:36px; animation:fadeUp 0.7s ease 0.3s both; }
+    .btn-primary-custom { background:var(--accent); color:#fff; border:none; border-radius:12px; padding:14px 28px; font-size:15px; font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer; transition:background 0.2s,transform 0.15s; text-decoration:none; display:inline-block; }
+    .btn-primary-custom:hover { background:var(--accent2); transform:translateY(-2px); color:#fff; }
+    .btn-ghost { background:transparent; color:var(--text); border:1px solid var(--border); border-radius:12px; padding:14px 28px; font-size:15px; font-family:'DM Sans',sans-serif; font-weight:500; cursor:pointer; transition:border-color 0.2s,transform 0.15s; text-decoration:none; display:inline-block; }
+    .btn-ghost:hover { border-color:var(--accent2); transform:translateY(-2px); color:var(--text); }
+    .hero-visual { animation:fadeUp 0.8s ease 0.2s both; }
 
-    /* ── FEATURES ── */
-    .section { padding: 90px 0; }
-    .section-label {
-      font-size: 12px; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--accent2);
-      font-weight: 500; margin-bottom: 14px;
-    }
-    .section-title {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(28px, 4vw, 44px);
-      font-weight: 800; line-height: 1.15;
-    }
-    .section-sub { font-size: 16px; color: var(--muted); line-height: 1.7; margin-top: 14px; }
+    /* CHAT PREVIEW */
+    .chat-preview { background:var(--surface); border:1px solid var(--border); border-radius:20px; overflow:hidden; max-width:460px; }
+    .chat-topbar { background:var(--surface2); border-bottom:1px solid var(--border); padding:14px 18px; display:flex; align-items:center; gap:10px; }
+    .chat-avatar { width:32px; height:32px; border-radius:8px; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff; }
+    .chat-topbar-info strong { font-size:14px; font-weight:600; display:block; }
+    .chat-topbar-info span { font-size:11px; color:var(--muted); }
+    .chat-body { padding:20px 18px; display:flex; flex-direction:column; gap:14px; }
+    .chat-msg { display:flex; gap:10px; }
+    .chat-msg.user { flex-direction:row-reverse; }
+    .chat-av { width:28px; height:28px; border-radius:7px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; font-family:'Syne',sans-serif; font-weight:700; }
+    .bot-av-sm { background:var(--accent); color:#fff; }
+    .user-av-sm { background:rgba(255,255,255,0.08); color:var(--text); }
+    .chat-bubble { padding:10px 14px; font-size:13.5px; line-height:1.6; max-width:78%; word-break:break-word; }
+    .bot-bubble { background:var(--surface2); color:var(--text); border:1px solid var(--border); border-radius:4px 14px 14px 14px; }
+    .user-bubble { background:var(--accent); color:#fff; border-radius:14px 4px 14px 14px; }
+    .typing-dots { display:flex; gap:4px; align-items:center; padding:12px 14px; background:var(--surface2); border:1px solid var(--border); border-radius:4px 14px 14px 14px; width:fit-content; }
+    .typing-dots span { width:6px; height:6px; border-radius:50%; background:var(--muted); animation:bounce 1.2s infinite; }
+    .typing-dots span:nth-child(2){animation-delay:0.2s} .typing-dots span:nth-child(3){animation-delay:0.4s}
+    @keyframes bounce { 0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-5px);opacity:1} }
 
-    .feature-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 30px 28px;
-      height: 100%;
-      transition: border-color 0.3s, transform 0.3s;
-      cursor: default;
-    }
-    .feature-card:hover {
-      border-color: rgba(124,92,252,0.35);
-      transform: translateY(-4px);
-    }
-    .feature-icon {
-      width: 48px; height: 48px; border-radius: 13px;
-      background: var(--accent-soft);
-      border: 1px solid rgba(124,92,252,0.2);
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 20px;
-    }
-    .feature-icon svg { width: 22px; height: 22px; }
-    .feature-card h3 {
-      font-family: 'Syne', sans-serif;
-      font-size: 18px; font-weight: 700; margin-bottom: 10px;
-    }
-    .feature-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+    /* STATS */
+    .stats-bar { border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:var(--surface); padding:36px 0; }
+    .stat-item { text-align:center; }
+    .stat-num { font-family:'Syne',sans-serif; font-size:36px; font-weight:800; color:var(--text); }
+    .stat-num span { color:var(--accent2); }
+    .stat-label { font-size:13px; color:var(--muted); margin-top:4px; }
 
-    /* ── HOW IT WORKS ── */
-    .how-bg { background: var(--surface); }
-    .step-num {
-      font-family: 'Syne', sans-serif;
-      font-size: 48px; font-weight: 800;
-      color: rgba(124,92,252,0.15);
-      line-height: 1;
-      margin-bottom: 12px;
-    }
-    .step-card {
-      padding: 32px 28px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: var(--surface2);
-      height: 100%;
-      transition: border-color 0.3s;
-    }
-    .step-card:hover { border-color: rgba(124,92,252,0.3); }
-    .step-card h4 {
-      font-family: 'Syne', sans-serif;
-      font-size: 17px; font-weight: 700; margin-bottom: 10px;
-    }
-    .step-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+    /* FEATURES */
+    .section { padding:90px 0; }
+    .section-label { font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent2); font-weight:500; margin-bottom:14px; }
+    .section-title { font-family:'Syne',sans-serif; font-size:clamp(28px,4vw,44px); font-weight:800; line-height:1.15; }
+    .section-sub { font-size:16px; color:var(--muted); line-height:1.7; margin-top:14px; }
+    .feature-card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:30px 28px; height:100%; transition:border-color 0.3s,transform 0.3s; cursor:default; }
+    .feature-card:hover { border-color:rgba(124,92,252,0.35); transform:translateY(-4px); }
+    .feature-icon { width:48px; height:48px; border-radius:13px; background:var(--accent-soft); border:1px solid rgba(124,92,252,0.2); display:flex; align-items:center; justify-content:center; margin-bottom:20px; }
+    .feature-icon svg { width:22px; height:22px; }
+    .feature-card h3 { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; margin-bottom:10px; }
+    .feature-card p { font-size:14px; color:var(--muted); line-height:1.7; }
 
-    /* ── LIVE DEMO ── */
-    .demo-section { background: var(--surface2); }
-    .demo-wrap {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
-    }
-    .demo-header {
-      background: var(--surface2);
-      border-bottom: 1px solid var(--border);
-      padding: 16px 20px;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .demo-header strong { font-family: 'Syne', sans-serif; font-size: 15px; }
-    .demo-messages {
-      padding: 24px 20px;
-      display: flex; flex-direction: column; gap: 16px;
-      min-height: 280px; max-height: 340px; overflow-y: auto;
-    }
-    .demo-input-bar {
-      border-top: 1px solid var(--border);
-      padding: 14px 16px;
-      display: flex; gap: 10px;
-    }
-    .demo-input {
-      flex: 1; background: var(--surface2);
-      border: 1px solid var(--border); border-radius: 12px;
-      padding: 10px 14px; color: var(--text);
-      font-family: 'DM Sans', sans-serif; font-size: 14px;
-      outline: none; transition: border-color 0.2s;
-    }
-    .demo-input::placeholder { color: var(--muted); }
-    .demo-input:focus { border-color: rgba(124,92,252,0.5); }
-    .demo-send {
-      width: 38px; height: 38px; border-radius: 10px;
-      background: var(--accent); border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s, transform 0.15s;
-      flex-shrink: 0;
-    }
-    .demo-send:hover { background: var(--accent2); transform: scale(1.05); }
-    .demo-send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-    .demo-send svg { width: 16px; height: 16px; fill: #fff; }
-    .demo-chips {
-      padding: 0 20px 16px;
-      display: flex; gap: 8px; flex-wrap: wrap;
-    }
-    .demo-chip {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 20px; padding: 6px 14px;
-      font-size: 12px; color: var(--muted);
-      cursor: pointer; transition: all 0.2s;
-    }
-    .demo-chip:hover { border-color: var(--accent); color: var(--accent2); }
+    /* HOW IT WORKS */
+    .how-bg { background:var(--surface); }
+    .step-num { font-family:'Syne',sans-serif; font-size:48px; font-weight:800; color:rgba(124,92,252,0.15); line-height:1; margin-bottom:12px; }
+    .step-card { padding:32px 28px; border:1px solid var(--border); border-radius:18px; background:var(--surface2); height:100%; transition:border-color 0.3s; }
+    .step-card:hover { border-color:rgba(124,92,252,0.3); }
+    .step-card h4 { font-family:'Syne',sans-serif; font-size:17px; font-weight:700; margin-bottom:10px; }
+    .step-card p { font-size:14px; color:var(--muted); line-height:1.7; }
 
-    /* ── BOT MESSAGE FORMATTING ── */
-    .bot-bubble ol {
-      margin: 6px 0 0 0;
-      padding-left: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .bot-bubble ol li {
-      padding-left: 4px;
-      line-height: 1.6;
-    }
-    .bot-bubble p {
-      margin: 0 0 6px 0;
-    }
-    .bot-bubble p:last-child {
-      margin-bottom: 0;
-    }
-    .bot-bubble ul {
-      margin: 6px 0 0 0;
-      padding-left: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      list-style: disc;
-    }
-    .bot-bubble ul li {
-      padding-left: 4px;
-      line-height: 1.6;
-    }
+    /* LIVE DEMO */
+    .demo-section { background:var(--surface2); }
+    .demo-wrap { background:var(--surface); border:1px solid var(--border); border-radius:20px; overflow:hidden; }
+    .demo-header { background:var(--surface2); border-bottom:1px solid var(--border); padding:16px 20px; display:flex; align-items:center; gap:10px; }
+    .demo-header strong { font-family:'Syne',sans-serif; font-size:15px; }
+    .demo-messages { padding:24px 20px; display:flex; flex-direction:column; gap:16px; min-height:280px; max-height:340px; overflow-y:auto; }
+    .demo-input-bar { border-top:1px solid var(--border); padding:14px 16px; display:flex; gap:10px; }
+    .demo-input { flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:10px 14px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; outline:none; transition:border-color 0.2s; }
+    .demo-input::placeholder { color:var(--muted); }
+    .demo-input:focus { border-color:rgba(124,92,252,0.5); }
+    .demo-send { width:38px; height:38px; border-radius:10px; background:var(--accent); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.2s,transform 0.15s; flex-shrink:0; }
+    .demo-send:hover { background:var(--accent2); transform:scale(1.05); }
+    .demo-send:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+    .demo-send svg { width:16px; height:16px; fill:#fff; }
+    .demo-chips { padding:0 20px 16px; display:flex; gap:8px; flex-wrap:wrap; }
+    .demo-chip { background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:6px 14px; font-size:12px; color:var(--muted); cursor:pointer; transition:all 0.2s; }
+    .demo-chip:hover { border-color:var(--accent); color:var(--accent2); }
+    .bot-bubble ol { margin:6px 0 0; padding-left:18px; display:flex; flex-direction:column; gap:6px; }
+    .bot-bubble ol li { padding-left:4px; line-height:1.6; }
+    .bot-bubble p { margin:0 0 6px; }
+    .bot-bubble p:last-child { margin-bottom:0; }
+    .bot-bubble ul { margin:6px 0 0; padding-left:18px; display:flex; flex-direction:column; gap:4px; list-style:disc; }
+    .bot-bubble ul li { padding-left:4px; line-height:1.6; }
 
-    /* ── TESTIMONIALS ── */
-    .testimonial-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 28px 26px;
-      height: 100%;
-    }
-    .stars { color: #f59e0b; font-size: 14px; margin-bottom: 14px; letter-spacing: 2px; }
-    .testimonial-text { font-size: 14.5px; color: var(--muted); line-height: 1.75; margin-bottom: 20px; }
-    .testimonial-author { display: flex; align-items: center; gap: 12px; }
-    .t-avatar {
-      width: 38px; height: 38px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 700; font-family: 'Syne', sans-serif;
-    }
-    .t-name { font-size: 14px; font-weight: 600; }
-    .t-role { font-size: 12px; color: var(--muted); }
+    /* TESTIMONIALS */
+    .testimonial-card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:28px 26px; height:100%; }
+    .stars { color:#f59e0b; font-size:14px; margin-bottom:14px; letter-spacing:2px; }
+    .testimonial-text { font-size:14.5px; color:var(--muted); line-height:1.75; margin-bottom:20px; }
+    .testimonial-author { display:flex; align-items:center; gap:12px; }
+    .t-avatar { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; font-family:'Syne',sans-serif; }
+    .t-name { font-size:14px; font-weight:600; }
+    .t-role { font-size:12px; color:var(--muted); }
 
-    /* ── CTA ── */
-    .cta-section {
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 90px 0;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .cta-section::before {
-      content: '';
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%,-50%);
-      width: 600px; height: 400px;
-      background: radial-gradient(ellipse, rgba(124,92,252,0.1) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .cta-section h2 {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(28px, 4vw, 48px);
-      font-weight: 800; margin-bottom: 16px;
-    }
-    .cta-section p { font-size: 16px; color: var(--muted); max-width: 420px; margin: 0 auto 36px; }
+    /* CTA & FOOTER */
+    .cta-section { background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:90px 0; text-align:center; position:relative; overflow:hidden; }
+    .cta-section::before { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:600px; height:400px; background:radial-gradient(ellipse,rgba(124,92,252,0.1) 0%,transparent 70%); pointer-events:none; }
+    .cta-section h2 { font-family:'Syne',sans-serif; font-size:clamp(28px,4vw,48px); font-weight:800; margin-bottom:16px; }
+    .cta-section p { font-size:16px; color:var(--muted); max-width:420px; margin:0 auto 36px; }
+    footer { background:var(--bg); border-top:1px solid var(--border); padding:40px 0 28px; }
+    .footer-brand { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+    .footer-copy { font-size:13px; color:var(--muted); }
+    .footer-link { color:var(--muted); text-decoration:none; font-size:14px; transition:color 0.2s; }
+    .footer-link:hover { color:var(--accent2); }
 
-    /* ── FOOTER ── */
-    footer {
-      background: var(--bg);
-      border-top: 1px solid var(--border);
-      padding: 40px 0 28px;
-    }
-    .footer-brand {
-      font-family: 'Syne', sans-serif;
-      font-size: 18px; font-weight: 800;
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 10px;
-    }
-    .footer-copy { font-size: 13px; color: var(--muted); }
-    .footer-link { color: var(--muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
-    .footer-link:hover { color: var(--accent2); }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .fade-up { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
-    .fade-up.visible { opacity: 1; transform: translateY(0); }
-
-    /* ── SCROLLBAR ── */
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      .hero { padding: 60px 0 40px; min-height: auto; }
-      .hero-visual { margin-top: 40px; }
-      .chat-preview { max-width: 100%; }
-    }
+    /* ANIMATIONS */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)} }
+    .fade-up { opacity:0; transform:translateY(20px); transition:opacity 0.6s ease,transform 0.6s ease; }
+    .fade-up.visible { opacity:1; transform:translateY(0); }
+    ::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    @media(max-width:768px){.hero{padding:60px 0 40px;min-height:auto}.hero-visual{margin-top:40px}.chat-preview{max-width:100%}}
   </style>
 </head>
 <body>
 
-<!-- ── NAV ── -->
+<!-- ═══════════ AUTH OVERLAY ═══════════ -->
+<div id="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-logo">✦</div>
+    <div class="auth-title">PhenilRoopa.ai</div>
+    <div class="auth-subtitle">Sign in or create an account to continue</div>
+    <div class="auth-tab-row">
+      <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="auth-panel active" id="panel-login">
+      <div id="login-err" class="auth-err"></div>
+      <div class="auth-form">
+        <div class="auth-field"><label>Email</label><input type="email" id="login-email" placeholder="you@example.com" /></div>
+        <div class="auth-field"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••" /></div>
+        <button class="auth-btn" onclick="doLogin()">Sign In →</button>
+      </div>
+    </div>
+
+    <!-- SIGNUP -->
+    <div class="auth-panel" id="panel-signup">
+      <div id="signup-err" class="auth-err"></div>
+      <div class="auth-form">
+        <div class="auth-field"><label>Full Name</label><input type="text" id="signup-name" placeholder="Your name" /></div>
+        <div class="auth-field"><label>Email</label><input type="email" id="signup-email" placeholder="you@example.com" /></div>
+        <div class="auth-field"><label>Password</label><input type="password" id="signup-pass" placeholder="Min. 6 characters" /></div>
+        <button class="auth-btn" onclick="doSignup()">Create Account →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ PAYMENT MODAL ═══════════ -->
+<div id="payment-modal">
+  <div class="payment-card">
+    <div class="paytm-icon">
+      <div class="pi1">Pay</div>
+      <div class="pi2">TM</div>
+    </div>
+    <div class="payment-title" id="pay-welcome">Welcome back! 🎉</div>
+    <div class="payment-sub">A small ₹10 access fee supports PhenilRoopa.ai.<br>Quick &amp; secure via Paytm UPI.</div>
+    <div class="payment-box">
+      <div class="lbl">Amount Due</div>
+      <div class="amount"><span class="csym">₹</span>10</div>
+      <div class="upi">Pay to UPI: <span>phenil@ptaxis</span></div>
+    </div>
+    <a id="paytm-link" class="pay-btn" href="#" target="_blank" rel="noopener noreferrer" onclick="onPayClick()">
+      💳 &nbsp;Open Paytm &amp; Pay ₹10
+    </a>
+    <button class="pay-skip" onclick="skipPayment()">Skip for now</button>
+    <div class="payment-note">
+      <strong>How to pay manually:</strong><br>
+      Open Paytm → Pay → Send to UPI → Enter <strong>phenil@ptaxis</strong> → Amount ₹10 → Pay Now.<br><br>
+      The button above will open Paytm directly on your phone.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ NAV ═══════════ -->
 <nav>
   <div class="container">
     <div class="d-flex align-items-center justify-content-between">
@@ -477,22 +315,19 @@
         <a href="#features" class="nav-link-custom">Features</a>
         <a href="#how" class="nav-link-custom">How it works</a>
         <a href="#demo" class="nav-link-custom">Try it</a>
-        <a href="index.html" class="btn-nav ms-3">Open Chat</a>
+        <div id="nav-user" class="ms-3"></div>
       </div>
-      <a href="index.html" class="btn-nav d-md-none">Open Chat</a>
+      <div id="nav-user-m" class="d-md-none"></div>
     </div>
   </div>
 </nav>
 
-<!-- ── HERO ── -->
+<!-- ═══════════ HERO ═══════════ -->
 <section class="hero">
   <div class="container">
     <div class="row align-items-center g-5">
       <div class="col-lg-6">
-        <div class="hero-badge">
-          <div class="status-dot"></div>
-          Powered by Llama 3.3 · Groq
-        </div>
+        <div class="hero-badge"><div class="status-dot"></div>Powered by Llama 3.3 · Groq</div>
         <h1>Meet your AI<br /><span>thinking partner</span></h1>
         <p class="hero-sub">PhenilRoopa is a blazing-fast AI assistant built on Groq's inference engine. Ask anything — it thinks in milliseconds.</p>
         <div class="hero-actions">
@@ -504,27 +339,24 @@
         <div class="chat-preview ms-lg-auto">
           <div class="chat-topbar">
             <div class="chat-avatar">✦</div>
-            <div class="chat-topbar-info">
-              <strong>PhenilRoopa</strong>
-              <span>AI · Always available</span>
-            </div>
+            <div class="chat-topbar-info"><strong>PhenilRoopa</strong><span>AI · Always available</span></div>
             <div class="ms-auto d-flex align-items-center gap-2">
               <div class="status-dot"></div>
-              <span style="font-size:12px; color:var(--green)">Online</span>
+              <span style="font-size:12px;color:var(--green)">Online</span>
             </div>
           </div>
           <div class="chat-body">
             <div class="chat-msg">
               <div class="chat-av bot-av-sm">✦</div>
-              <div class="chat-bubble bot-bubble">Hello! I'm PhenilRoopa, your AI assistant. What would you like to explore today?</div>
+              <div class="chat-bubble bot-bubble">Hey! I'm PhenilRoopa. How can I help you today?</div>
             </div>
             <div class="chat-msg user">
               <div class="chat-av user-av-sm">U</div>
-              <div class="chat-bubble user-bubble">Explain quantum computing in simple terms</div>
+              <div class="chat-bubble user-bubble">Explain recursion simply</div>
             </div>
             <div class="chat-msg">
               <div class="chat-av bot-av-sm">✦</div>
-              <div class="chat-bubble bot-bubble">Quantum computing uses quantum bits (qubits) that can be 0 and 1 simultaneously — unlike regular bits. This lets quantum computers solve certain problems exponentially faster. Think of it like trying every path of a maze at once instead of one at a time.</div>
+              <div class="chat-bubble bot-bubble">Recursion is when a function calls itself to solve a smaller version of the same problem…</div>
             </div>
             <div class="chat-msg">
               <div class="chat-av bot-av-sm">✦</div>
@@ -537,31 +369,19 @@
   </div>
 </section>
 
-<!-- ── STATS ── -->
+<!-- STATS -->
 <div class="stats-bar">
   <div class="container">
     <div class="row g-4 text-center">
-      <div class="col-6 col-md-3 fade-up">
-        <div class="stat-num">~<span>30</span>ms</div>
-        <div class="stat-label">Average response time</div>
-      </div>
-      <div class="col-6 col-md-3 fade-up">
-        <div class="stat-num"><span>70B</span></div>
-        <div class="stat-label">Parameter model</div>
-      </div>
-      <div class="col-6 col-md-3 fade-up">
-        <div class="stat-num"><span>∞</span></div>
-        <div class="stat-label">Topics covered</div>
-      </div>
-      <div class="col-6 col-md-3 fade-up">
-        <div class="stat-num"><span>24</span>/7</div>
-        <div class="stat-label">Always online</div>
-      </div>
+      <div class="col-6 col-md-3 fade-up"><div class="stat-num">~<span>30</span>ms</div><div class="stat-label">Average response time</div></div>
+      <div class="col-6 col-md-3 fade-up"><div class="stat-num"><span>70B</span></div><div class="stat-label">Parameter model</div></div>
+      <div class="col-6 col-md-3 fade-up"><div class="stat-num"><span>∞</span></div><div class="stat-label">Topics covered</div></div>
+      <div class="col-6 col-md-3 fade-up"><div class="stat-num"><span>24</span>/7</div><div class="stat-label">Always online</div></div>
     </div>
   </div>
 </div>
 
-<!-- ── FEATURES ── -->
+<!-- FEATURES -->
 <section class="section" id="features">
   <div class="container">
     <div class="text-center mb-5 fade-up">
@@ -570,65 +390,17 @@
       <p class="section-sub mx-auto" style="max-width:480px">From creative writing to coding to research — PhenilRoopa handles it all with speed and precision.</p>
     </div>
     <div class="row g-4">
-      <div class="col-md-6 col-lg-4 fade-up">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-          </div>
-          <h3>Lightning fast</h3>
-          <p>Groq's custom inference hardware delivers responses in under 100ms. No more waiting — just instant answers.</p>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 fade-up">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-          </div>
-          <h3>Creative writing</h3>
-          <p>Poems, stories, essays, emails — PhenilRoopa writes with style, adapting tone and voice to your needs.</p>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 fade-up">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-          </div>
-          <h3>Code assistance</h3>
-          <p>Debug, explain, refactor, and generate code across every major language. Your pair programmer is here.</p>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 fade-up">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-          </div>
-          <h3>Memory in conversation</h3>
-          <p>Context is maintained throughout the chat — PhenilRoopa remembers what you said earlier in the session.</p>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 fade-up">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-          </div>
-          <h3>Natural conversation</h3>
-          <p>Chat just like you would with a knowledgeable friend. No commands, no syntax — just plain language.</p>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 fade-up">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          </div>
-          <h3>Private & secure</h3>
-          <p>Your conversations are yours alone. No data sold, no profiles built. Just a clean, private AI experience.</p>
-        </div>
-      </div>
+      <div class="col-md-6 col-lg-4 fade-up"><div class="feature-card"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><h3>Lightning fast</h3><p>Groq's custom inference hardware delivers responses in under 100ms. No more waiting — just instant answers.</p></div></div>
+      <div class="col-md-6 col-lg-4 fade-up"><div class="feature-card"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><h3>Creative writing</h3><p>Poems, stories, essays, emails — PhenilRoopa writes with style, adapting tone and voice to your needs.</p></div></div>
+      <div class="col-md-6 col-lg-4 fade-up"><div class="feature-card"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><h3>Code assistance</h3><p>Debug, explain, refactor, and generate code across every major language. Your pair programmer is here.</p></div></div>
+      <div class="col-md-6 col-lg-4 fade-up"><div class="feature-card"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><h3>Memory in conversation</h3><p>Context is maintained throughout the chat — PhenilRoopa remembers what you said earlier in the session.</p></div></div>
+      <div class="col-md-6 col-lg-4 fade-up"><div class="feature-card"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><h3>Natural conversation</h3><p>Chat just like you would with a knowledgeable friend. No commands, no syntax — just plain language.</p></div></div>
+      <div class="col-md-6 col-lg-4 fade-up"><div class="feature-card"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div><h3>Private &amp; secure</h3><p>Your conversations are yours alone. No data sold, no profiles built. Just a clean, private AI experience.</p></div></div>
     </div>
   </div>
 </section>
 
-<!-- ── HOW IT WORKS ── -->
+<!-- HOW IT WORKS -->
 <section class="section how-bg" id="how">
   <div class="container">
     <div class="text-center mb-5 fade-up">
@@ -637,32 +409,14 @@
       <p class="section-sub mx-auto" style="max-width:420px">Three simple steps from question to answer.</p>
     </div>
     <div class="row g-4">
-      <div class="col-md-4 fade-up">
-        <div class="step-card">
-          <div class="step-num">01</div>
-          <h4>Type your question</h4>
-          <p>Write anything — a question, a task, a creative prompt. There's no right or wrong way to ask.</p>
-        </div>
-      </div>
-      <div class="col-md-4 fade-up">
-        <div class="step-card">
-          <div class="step-num">02</div>
-          <h4>Groq processes it</h4>
-          <p>Your message reaches Groq's inference engine which runs Llama 3.3 70B at extraordinary speed.</p>
-        </div>
-      </div>
-      <div class="col-md-4 fade-up">
-        <div class="step-card">
-          <div class="step-num">03</div>
-          <h4>Instant reply</h4>
-          <p>PhenilRoopa delivers a thoughtful, accurate response — usually in under a second. Keep the conversation going.</p>
-        </div>
-      </div>
+      <div class="col-md-4 fade-up"><div class="step-card"><div class="step-num">01</div><h4>Type your question</h4><p>Write anything — a question, a task, a creative prompt. There's no right or wrong way to ask.</p></div></div>
+      <div class="col-md-4 fade-up"><div class="step-card"><div class="step-num">02</div><h4>Groq processes it</h4><p>Your message reaches Groq's inference engine which runs Llama 3.3 70B at extraordinary speed.</p></div></div>
+      <div class="col-md-4 fade-up"><div class="step-card"><div class="step-num">03</div><h4>Instant reply</h4><p>PhenilRoopa delivers a thoughtful, accurate response — usually in under a second. Keep the conversation going.</p></div></div>
     </div>
   </div>
 </section>
 
-<!-- ── LIVE DEMO ── -->
+<!-- LIVE DEMO -->
 <section class="section demo-section" id="demo">
   <div class="container">
     <div class="text-center mb-5 fade-up">
@@ -684,14 +438,14 @@
           <div class="demo-messages" id="demo-msgs">
             <div class="chat-msg">
               <div class="chat-av bot-av-sm" style="width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0;">✦</div>
-              <div class="chat-bubble bot-bubble">Hi! I'm PhenilRoopa. Ask me anything — I'm powered by Llama 3.3 on Groq and respond instantly.</div>
+              <div class="chat-bubble bot-bubble">Hi! I'm PhenilRoopa. Ask me anything — powered by Llama 3.3 on Groq.</div>
             </div>
           </div>
           <div class="demo-chips" id="demo-chips">
             <div class="demo-chip" onclick="demoChip(this)">Write a haiku about code</div>
             <div class="demo-chip" onclick="demoChip(this)">What is machine learning?</div>
             <div class="demo-chip" onclick="demoChip(this)">Tell me a fun fact</div>
-            <div class="demo-chip" onclick="demoChip(this)">Help me brainstorm startup ideas</div>
+            <div class="demo-chip" onclick="demoChip(this)">Brainstorm startup ideas</div>
           </div>
           <div class="demo-input-bar">
             <input type="text" class="demo-input" id="demo-input" placeholder="Ask me anything..." />
@@ -705,7 +459,7 @@
   </div>
 </section>
 
-<!-- ── TESTIMONIALS ── -->
+<!-- TESTIMONIALS -->
 <section class="section" id="testimonials">
   <div class="container">
     <div class="text-center mb-5 fade-up">
@@ -713,67 +467,28 @@
       <h2 class="section-title">Built for real people</h2>
     </div>
     <div class="row g-4">
-      <div class="col-md-4 fade-up">
-        <div class="testimonial-card">
-          <div class="stars">★★★★★</div>
-          <p class="testimonial-text">"PhenilRoopa helped me debug a nasty React bug in minutes. Explained the issue clearly and gave me working code. Incredible speed."</p>
-          <div class="testimonial-author">
-            <div class="t-avatar" style="background:rgba(124,92,252,0.15);color:#a78bfa;">AK</div>
-            <div>
-              <div class="t-name">Arjun K.</div>
-              <div class="t-role">Frontend Developer</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4 fade-up">
-        <div class="testimonial-card">
-          <div class="stars">★★★★★</div>
-          <p class="testimonial-text">"I use it every day for writing emails and summarizing research. The responses are thoughtful and genuinely helpful — not just filler."</p>
-          <div class="testimonial-author">
-            <div class="t-avatar" style="background:rgba(29,158,117,0.15);color:#5DCAA5;">SM</div>
-            <div>
-              <div class="t-name">Sneha M.</div>
-              <div class="t-role">Product Manager</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4 fade-up">
-        <div class="testimonial-card">
-          <div class="stars">★★★★★</div>
-          <p class="testimonial-text">"As a student, having an AI that explains complex topics simply is game-changing. PhenilRoopa is my favourite study tool by far."</p>
-          <div class="testimonial-author">
-            <div class="t-avatar" style="background:rgba(216,90,48,0.15);color:#F0997B;">RD</div>
-            <div>
-              <div class="t-name">Rohan D.</div>
-              <div class="t-role">Engineering Student</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div class="col-md-4 fade-up"><div class="testimonial-card"><div class="stars">★★★★★</div><p class="testimonial-text">"PhenilRoopa helped me debug a nasty React bug in minutes. Explained the issue clearly and gave me working code. Incredible speed."</p><div class="testimonial-author"><div class="t-avatar" style="background:rgba(124,92,252,0.15);color:#a78bfa;">AK</div><div><div class="t-name">Arjun K.</div><div class="t-role">Frontend Developer</div></div></div></div></div>
+      <div class="col-md-4 fade-up"><div class="testimonial-card"><div class="stars">★★★★★</div><p class="testimonial-text">"I use it every day for writing emails and summarizing research. The responses are thoughtful and genuinely helpful — not just filler."</p><div class="testimonial-author"><div class="t-avatar" style="background:rgba(29,158,117,0.15);color:#5DCAA5;">SM</div><div><div class="t-name">Sneha M.</div><div class="t-role">Product Manager</div></div></div></div></div>
+      <div class="col-md-4 fade-up"><div class="testimonial-card"><div class="stars">★★★★★</div><p class="testimonial-text">"As a student, having an AI that explains complex topics simply is game-changing. PhenilRoopa is my favourite study tool by far."</p><div class="testimonial-author"><div class="t-avatar" style="background:rgba(216,90,48,0.15);color:#F0997B;">RD</div><div><div class="t-name">Rohan D.</div><div class="t-role">Engineering Student</div></div></div></div></div>
     </div>
   </div>
 </section>
 
-<!-- ── CTA ── -->
+<!-- CTA -->
 <section class="cta-section">
   <div class="container position-relative">
     <h2>Ready to think faster?</h2>
     <p>Join thousands of people already using PhenilRoopa to work smarter every day.</p>
-    <a href="index.html" class="btn-primary-custom" style="font-size:16px;padding:16px 36px;">Start chatting — it's free</a>
+    <a href="#demo" class="btn-primary-custom" style="font-size:16px;padding:16px 36px;">Start chatting — it's free</a>
   </div>
 </section>
 
-<!-- ── FOOTER ── -->
+<!-- FOOTER -->
 <footer>
   <div class="container">
     <div class="row align-items-center g-3">
       <div class="col-md-5">
-        <div class="footer-brand">
-          <div class="nav-logo">✦</div>
-          PhenilRoopa.ai
-        </div>
+        <div class="footer-brand"><div class="nav-logo">✦</div>PhenilRoopa.ai</div>
         <p class="footer-copy">Powered by Llama 3.3 · Groq inference · Built with love</p>
       </div>
       <div class="col-md-7">
@@ -794,167 +509,210 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  const BACKEND = 'https://phenilroopa-backend.onrender.com/chat';
-  let demoHistory = [];
-  let demoLoading = false;
+/* ════════════════════════════════════════
+   AUTH + PAYMENT SYSTEM
+   - First visit: Sign Up → free access
+   - Return login (2nd+ time): Show ₹10 Paytm payment prompt
+════════════════════════════════════════ */
 
-  const demoInput = document.getElementById('demo-input');
-  const demoSendBtn = document.getElementById('demo-send');
-  const demoMsgs = document.getElementById('demo-msgs');
+const UPI_ID   = 'phenil@ptaxis';
+const UPI_NAME = 'PhenilRoopa.ai';
+const UPI_AMT  = '10';
 
-  demoInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); demoSend(); }
+function buildUpiLink() {
+  return 'upi://pay?pa=' + encodeURIComponent(UPI_ID)
+       + '&pn=' + encodeURIComponent(UPI_NAME)
+       + '&am=' + UPI_AMT
+       + '&cu=INR'
+       + '&tn=' + encodeURIComponent('PhenilRoopa Access Fee');
+}
+
+/* ── Storage ── */
+function getUsers()   { try { return JSON.parse(localStorage.getItem('pr_users')||'{}'); } catch(e){ return {}; } }
+function saveUsers(u) { localStorage.setItem('pr_users', JSON.stringify(u)); }
+function getSession() { try { return JSON.parse(localStorage.getItem('pr_sess')||'null'); } catch(e){ return null; } }
+function saveSession(s){ localStorage.setItem('pr_sess', JSON.stringify(s)); }
+function clearSession(){ localStorage.removeItem('pr_sess'); }
+
+/* ── Simple hash (demo only) ── */
+function hashPass(p) {
+  let h = 5381;
+  for (let i = 0; i < p.length; i++) h = (h * 33) ^ p.charCodeAt(i);
+  return (h >>> 0).toString(36);
+}
+
+/* ── Tab switch ── */
+function switchTab(t) {
+  ['login','signup'].forEach(n => {
+    document.getElementById('tab-'+n).classList.toggle('active', n===t);
+    document.getElementById('panel-'+n).classList.toggle('active', n===t);
   });
+}
 
-  function demoChip(el) {
-    demoInput.value = el.textContent;
-    demoSend();
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 4500);
+}
+
+/* ── SIGN UP ── */
+function doSignup() {
+  const name  = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('signup-pass').value;
+  if (!name)  return showErr('signup-err','Please enter your name.');
+  if (!email || !email.includes('@')) return showErr('signup-err','Enter a valid email.');
+  if (pass.length < 6) return showErr('signup-err','Password must be at least 6 characters.');
+  const users = getUsers();
+  if (users[email]) return showErr('signup-err','Account exists — sign in instead.');
+  users[email] = { name, h: hashPass(pass), logins: 1 };
+  saveUsers(users);
+  saveSession({ email, name });
+  hideAuth(false); // first time = no payment
+}
+
+/* ── SIGN IN ── */
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('login-pass').value;
+  if (!email) return showErr('login-err','Please enter your email.');
+  if (!pass)  return showErr('login-err','Please enter your password.');
+  const users = getUsers();
+  const u = users[email];
+  if (!u) return showErr('login-err','No account found. Please sign up first.');
+  if (u.h !== hashPass(pass)) return showErr('login-err','Incorrect password. Try again.');
+  u.logins = (u.logins||0) + 1;
+  saveUsers(users);
+  saveSession({ email, name: u.name });
+  hideAuth(u.logins >= 2); // show payment on 2nd+ login
+}
+
+/* ── LOGOUT ── */
+function doLogout() { clearSession(); location.reload(); }
+
+/* ── Hide auth, show site ── */
+function hideAuth(showPay) {
+  const o = document.getElementById('auth-overlay');
+  o.style.transition = 'opacity 0.3s';
+  o.style.opacity = '0';
+  setTimeout(()=> {
+    o.style.display = 'none';
+    renderUser();
+    if (showPay) openPayment();
+  }, 300);
+}
+
+/* ── Render user pill in nav ── */
+function renderUser() {
+  const s = getSession();
+  if (!s) return;
+  const init = s.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const html = `<div class="nav-user-pill" onclick="doLogout()" title="Sign out">
+    <div class="nav-av">${init}</div>
+    <span>${s.name.split(' ')[0]}</span>
+    <span class="nav-out">Sign out</span>
+  </div>`;
+  document.getElementById('nav-user').innerHTML = html;
+  document.getElementById('nav-user-m').innerHTML = html;
+}
+
+/* ── Payment modal ── */
+function openPayment() {
+  const s = getSession();
+  if (s) document.getElementById('pay-welcome').textContent = 'Welcome back, ' + s.name.split(' ')[0] + '! 👋';
+  document.getElementById('paytm-link').href = buildUpiLink();
+  document.getElementById('payment-modal').classList.add('show');
+}
+function onPayClick() {
+  setTimeout(()=> document.getElementById('payment-modal').classList.remove('show'), 1000);
+}
+function skipPayment() {
+  document.getElementById('payment-modal').classList.remove('show');
+}
+
+/* ── Keyboard shortcuts ── */
+document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('login-email').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('login-pass').focus(); });
+document.getElementById('signup-pass').addEventListener('keydown', e => { if(e.key==='Enter') doSignup(); });
+document.getElementById('signup-email').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('signup-pass').focus(); });
+document.getElementById('signup-name').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('signup-email').focus(); });
+
+/* ── Restore session on load ── */
+(function() {
+  const s = getSession();
+  if (s) {
+    document.getElementById('auth-overlay').style.display = 'none';
+    renderUser();
   }
+})();
 
-  /* ── HTML escape to prevent XSS ── */
-  function escapeHtml(str) {
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+/* ════════════════════════════════════════
+   CHAT / DEMO
+════════════════════════════════════════ */
+const BACKEND = 'https://phenilroopa-backend.onrender.com/chat';
+let demoHistory = [], demoLoading = false;
+const demoInput   = document.getElementById('demo-input');
+const demoSendBtn = document.getElementById('demo-send');
+const demoMsgs    = document.getElementById('demo-msgs');
+
+demoInput.addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();demoSend();} });
+function demoChip(el){ demoInput.value=el.textContent; demoSend(); }
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function fmtBot(text) {
+  const lines = text.split('\n'); let html='', lt=null;
+  const cl = ()=>{ if(lt){html+='</'+lt+'>';lt=null;} };
+  for(const raw of lines){
+    const t=raw.trim();
+    const nm=t.match(/^(\d+)[.)]\s+(.+)/), bm=t.match(/^[-*•]\s+(.+)/);
+    if(nm){ if(lt!=='ol'){cl();html+='<ol>';lt='ol';}  html+='<li>'+esc(nm[2])+'</li>'; }
+    else if(bm){ if(lt!=='ul'){cl();html+='<ul>';lt='ul';} html+='<li>'+esc(bm[1])+'</li>'; }
+    else{ cl(); if(t) html+='<p>'+esc(t)+'</p>'; }
   }
+  cl(); return html;
+}
 
-  /* ── Format bot reply: numbered lists, bullet lists, paragraphs ── */
-  function formatBotMessage(text) {
-    const lines = text.split('\n');
-    let html = '';
-    let listType = null; // 'ol' or 'ul'
+function addMsg(role, text, isErr) {
+  const row=document.createElement('div'); row.className='chat-msg'+(role==='user'?' user':'');
+  const av=document.createElement('div'); av.className='chat-av '+(role==='user'?'user-av-sm':'bot-av-sm');
+  av.style.cssText='width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0;';
+  av.textContent=role==='user'?'U':'✦';
+  const b=document.createElement('div'); b.className='chat-bubble '+(role==='user'?'user-bubble':'bot-bubble');
+  if(isErr) b.style.color='#fca5a5';
+  if(role==='bot'&&!isErr) b.innerHTML=fmtBot(text); else b.textContent=text;
+  row.appendChild(av); row.appendChild(b); demoMsgs.appendChild(row);
+  demoMsgs.scrollTop=demoMsgs.scrollHeight;
+}
+function showTyping() {
+  const r=document.createElement('div'); r.className='chat-msg'; r.id='demo-typing';
+  const av=document.createElement('div'); av.className='chat-av bot-av-sm';
+  av.style.cssText='width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0;'; av.textContent='✦';
+  const d=document.createElement('div'); d.className='typing-dots';
+  d.innerHTML='<span></span><span></span><span></span>';
+  r.appendChild(av); r.appendChild(d); demoMsgs.appendChild(r);
+  demoMsgs.scrollTop=demoMsgs.scrollHeight;
+}
+function hideTyping(){ const t=document.getElementById('demo-typing'); if(t) t.remove(); }
 
-    function closeList() {
-      if (listType) {
-        html += '</' + listType + '>';
-        listType = null;
-      }
-    }
+async function demoSend() {
+  if(demoLoading) return;
+  const text=demoInput.value.trim(); if(!text) return;
+  addMsg('user',text); demoInput.value=''; demoLoading=true; demoSendBtn.disabled=true;
+  document.getElementById('demo-chips').style.display='none';
+  showTyping();
+  try {
+    const res=await fetch(BACKEND,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,history:demoHistory})});
+    const data=await res.json(); hideTyping();
+    if(data.reply){ addMsg('bot',data.reply); demoHistory.push({role:'user',content:text},{role:'assistant',content:data.reply}); }
+    else addMsg('bot','Error: '+(data.details||data.error||'Unknown'),true);
+  } catch(e){ hideTyping(); addMsg('bot','Could not reach the backend. Make sure Render is running.',true); }
+  finally { demoLoading=false; demoSendBtn.disabled=false; demoInput.focus(); }
+}
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const trimmed = line.trim();
-
-      // Numbered list: "1. item" or "1) item"
-      const numberedMatch = trimmed.match(/^(\d+)[.)]\s+(.+)/);
-      // Bullet list: "- item" or "* item" or "• item"
-      const bulletMatch = trimmed.match(/^[-*•]\s+(.+)/);
-
-      if (numberedMatch) {
-        if (listType !== 'ol') {
-          closeList();
-          html += '<ol>';
-          listType = 'ol';
-        }
-        html += '<li>' + escapeHtml(numberedMatch[2]) + '</li>';
-      } else if (bulletMatch) {
-        if (listType !== 'ul') {
-          closeList();
-          html += '<ul>';
-          listType = 'ul';
-        }
-        html += '<li>' + escapeHtml(bulletMatch[1]) + '</li>';
-      } else {
-        closeList();
-        if (trimmed !== '') {
-          html += '<p>' + escapeHtml(trimmed) + '</p>';
-        }
-      }
-    }
-
-    closeList();
-    return html;
-  }
-
-  /* ── Add a message bubble to the demo ── */
-  function addDemoMsg(role, text, isError) {
-    const row = document.createElement('div');
-    row.className = 'chat-msg' + (role === 'user' ? ' user' : '');
-
-    const av = document.createElement('div');
-    av.className = 'chat-av ' + (role === 'user' ? 'user-av-sm' : 'bot-av-sm');
-    av.style.cssText = 'width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0;';
-    av.textContent = role === 'user' ? 'U' : '✦';
-
-    const bubble = document.createElement('div');
-    bubble.className = 'chat-bubble ' + (role === 'user' ? 'user-bubble' : 'bot-bubble');
-    if (isError) bubble.style.color = '#fca5a5';
-
-    if (role === 'bot' && !isError) {
-      // Use rich HTML formatting for bot replies
-      bubble.innerHTML = formatBotMessage(text);
-    } else {
-      // Plain text for user messages and errors
-      bubble.textContent = text;
-    }
-
-    row.appendChild(av);
-    row.appendChild(bubble);
-    demoMsgs.appendChild(row);
-    demoMsgs.scrollTop = demoMsgs.scrollHeight;
-  }
-
-  function showDemoTyping() {
-    const row = document.createElement('div');
-    row.className = 'chat-msg'; row.id = 'demo-typing';
-    const av = document.createElement('div');
-    av.className = 'chat-av bot-av-sm';
-    av.style.cssText = 'width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0;';
-    av.textContent = '✦';
-    const dots = document.createElement('div');
-    dots.className = 'typing-dots';
-    dots.innerHTML = '<span></span><span></span><span></span>';
-    row.appendChild(av); row.appendChild(dots);
-    demoMsgs.appendChild(row);
-    demoMsgs.scrollTop = demoMsgs.scrollHeight;
-  }
-
-  function hideDemoTyping() {
-    const t = document.getElementById('demo-typing');
-    if (t) t.remove();
-  }
-
-  async function demoSend() {
-    if (demoLoading) return;
-    const text = demoInput.value.trim();
-    if (!text) return;
-    addDemoMsg('user', text);
-    demoInput.value = '';
-    demoLoading = true;
-    demoSendBtn.disabled = true;
-    document.getElementById('demo-chips').style.display = 'none';
-    showDemoTyping();
-    try {
-      const res = await fetch(BACKEND, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, history: demoHistory })
-      });
-      const data = await res.json();
-      hideDemoTyping();
-      if (data.reply) {
-        addDemoMsg('bot', data.reply);
-        demoHistory.push({ role: 'user', content: text });
-        demoHistory.push({ role: 'assistant', content: data.reply });
-      } else {
-        addDemoMsg('bot', 'Error: ' + (data.details || data.error || 'Unknown error'), true);
-      }
-    } catch (err) {
-      hideDemoTyping();
-      addDemoMsg('bot', 'Could not reach the backend. Make sure Render is running.', true);
-    } finally {
-      demoLoading = false;
-      demoSendBtn.disabled = false;
-      demoInput.focus();
-    }
-  }
-
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+/* ── Scroll animations ── */
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:0.1});
+document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
 </script>
 </body>
 </html>
