@@ -7,15 +7,12 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 
-  <!-- ✅ RAZORPAY SDK — Required for payment to work -->
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
   <style>
     :root {
       --bg: #0d0d14; --surface: #13131e; --surface2: #1a1a28; --surface3: #20202f;
       --border: rgba(255,255,255,0.07); --accent: #7c5cfc; --accent2: #a78bfa;
       --accent-soft: rgba(124,92,252,0.12); --text: #f0eeff; --muted: #8880a8;
-      --green: #4ade80; --rzp: #3395FF; --rzp-dark: #1a7ae8;
+      --green: #4ade80; --cf: #00BAF2; --cf-dark: #0099cc;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -81,21 +78,20 @@
     }
     #payment-overlay.show { display: flex; }
     .payment-card {
-      background: var(--surface); border: 1px solid rgba(51,149,255,0.25);
+      background: var(--surface); border: 1px solid rgba(0,186,242,0.25);
       border-radius: 24px; width: 100%; max-width: 420px;
       animation: slideUp 0.5s ease both;
-      box-shadow: 0 0 80px rgba(51,149,255,0.08), 0 40px 80px rgba(0,0,0,0.6);
+      box-shadow: 0 0 80px rgba(0,186,242,0.08), 0 40px 80px rgba(0,0,0,0.6);
       overflow: hidden;
     }
     .pay-header {
-      background: linear-gradient(135deg, #0d1a2e 0%, #0d2233 100%);
-      border-bottom: 1px solid rgba(51,149,255,0.15);
+      background: linear-gradient(135deg, #0a1a24 0%, #0d2233 100%);
+      border-bottom: 1px solid rgba(0,186,242,0.15);
       padding: 28px 30px 24px; text-align: center;
     }
-    .rzp-logo-wrap {
+    .cf-logo-wrap {
       display: inline-flex; align-items: center; gap: 10px; margin-bottom: 14px;
     }
-    .rzp-logo-wrap svg { height: 28px; }
     .pay-header h2 { font-family:'Syne',sans-serif; font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 6px; }
     .pay-header p { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.6; }
     .pay-body { padding: 26px 30px 28px; }
@@ -106,7 +102,7 @@
       border-radius: 16px; padding: 20px; margin-bottom: 20px;
     }
     .pay-amount-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-    .pay-amount-num { font-family:'Syne',sans-serif; font-size: 42px; font-weight: 800; color: var(--rzp); line-height: 1; }
+    .pay-amount-num { font-family:'Syne',sans-serif; font-size: 42px; font-weight: 800; color: var(--cf); line-height: 1; }
     .pay-amount-sub { font-size: 12px; color: var(--muted); margin-top: 6px; }
 
     /* payment methods badge */
@@ -114,20 +110,20 @@
       display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
     }
     .pay-method-tag {
-      background: rgba(51,149,255,0.08); border: 1px solid rgba(51,149,255,0.2);
-      border-radius: 20px; padding: 5px 12px; font-size: 11.5px; color: var(--rzp);
+      background: rgba(0,186,242,0.08); border: 1px solid rgba(0,186,242,0.2);
+      border-radius: 20px; padding: 5px 12px; font-size: 11.5px; color: var(--cf);
     }
 
     /* main pay button */
     .pay-btn-main {
-      display: block; width: 100%; background: var(--rzp); color: #fff;
+      display: block; width: 100%; background: var(--cf); color: #fff;
       border: none; border-radius: 13px; padding: 15px; font-size: 15px;
       font-family: 'DM Sans',sans-serif; font-weight: 700;
       cursor: pointer; transition: background 0.2s, transform 0.15s;
       text-align: center; text-decoration: none; margin-bottom: 12px;
       letter-spacing: 0.02em;
     }
-    .pay-btn-main:hover { background: var(--rzp-dark); transform: translateY(-2px); color: #fff; }
+    .pay-btn-main:hover { background: var(--cf-dark); transform: translateY(-2px); color: #fff; }
     .pay-btn-main:active { transform: translateY(0); }
 
     .pay-secure-note {
@@ -146,7 +142,6 @@
     }
     .pay-success h3 { font-family:'Syne',sans-serif; font-size: 22px; font-weight: 800; color: #4ade80; margin-bottom: 10px; }
     .pay-success p { font-size: 13px; color: var(--muted); line-height: 1.7; }
-    .pay-success .pay-id { font-size: 11px; color: rgba(124,92,252,0.7); margin-top: 10px; word-break: break-all; }
 
     /* ── NAV ── */
     nav { position:sticky; top:0; z-index:100; background:rgba(13,13,20,0.85); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:14px 0; }
@@ -308,17 +303,17 @@
 </div>
 
 <!-- ══════════════════════════════════════
-     RAZORPAY PAYMENT OVERLAY
+     CASHFREE PAYMENT OVERLAY
 ══════════════════════════════════════ -->
 <div id="payment-overlay">
   <div class="payment-card">
 
     <!-- Header -->
     <div class="pay-header">
-      <div class="rzp-logo-wrap">
-        <!-- Razorpay wordmark SVG -->
-        <svg viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <text y="24" font-size="20" font-weight="900" fill="#3395FF" font-family="Arial,sans-serif">razorpay</text>
+      <div class="cf-logo-wrap">
+        <!-- Cashfree wordmark -->
+        <svg viewBox="0 0 160 32" height="28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <text y="24" font-size="20" font-weight="900" fill="#00BAF2" font-family="Arial,sans-serif">cashfree</text>
         </svg>
       </div>
       <h2 id="pay-welcome">Complete your payment</h2>
@@ -343,11 +338,32 @@
           <span class="pay-method-tag">💼 Wallets</span>
         </div>
 
-        <button class="pay-btn-main" onclick="openRazorpay()">
-          🔒 Pay ₹10 Securely via Razorpay
-        </button>
+        <a
+          class="pay-btn-main"
+          id="cf-pay-link"
+          href="https://payments.cashfree.com/links?code=Sa9ndhuecg9g_AAAAAAATVYE"
+          target="_blank"
+          rel="noopener noreferrer"
+          onclick="onCashfreeClick()"
+        >
+          🔒 Pay ₹10 Securely via Cashfree
+        </a>
 
-        <div class="pay-secure-note">
+        <!-- After clicking, user confirms manually -->
+        <div id="pay-confirm-area" style="display:none; margin-top:16px; text-align:center;">
+          <p style="font-size:13px; color:var(--muted); margin-bottom:12px;">
+            After completing payment on Cashfree, click below to activate your access.
+          </p>
+          <button
+            class="pay-btn-main"
+            style="background:var(--accent); margin-bottom:0;"
+            onclick="onPaymentSuccess('CF-MANUAL-' + Date.now())"
+          >
+            ✅ I've completed the payment
+          </button>
+        </div>
+
+        <div class="pay-secure-note" style="margin-top:12px;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="11" width="18" height="11" rx="2"/>
             <path d="M7 11V7a5 5 0 0110 0v4"/>
@@ -362,7 +378,6 @@
           <div class="pay-success-icon">✓</div>
           <h3>Payment Successful!</h3>
           <p>Thank you! You now have full access to PhenilRoopa.ai</p>
-          <div class="pay-id" id="pay-success-id"></div>
         </div>
       </div>
 
@@ -568,25 +583,19 @@
 <script>
 
 /* ══════════════════════════════════════════════════════════
-   ✅ RAZORPAY CONFIG
-   👇 PASTE YOUR KEY ID HERE (from Razorpay Dashboard)
-   Dashboard → Settings → API Keys → Key ID
-   Example: rzp_test_AbCdEfGhIjKlMn12
-   ⚠️  Never paste your Key SECRET here — backend only!
+   CASHFREE PAYMENT LINK
 ══════════════════════════════════════════════════════════ */
-const RAZORPAY_KEY    = 'rzp_test_ShCjsra29oHWIj';  // 👈 REPLACE THIS
-const PAYMENT_AMOUNT  = 1000;   // ₹10 = 1000 paise (Razorpay uses paise)
-const PAYMENT_CURRENCY = 'INR';
+const CASHFREE_LINK = 'https://payments.cashfree.com/links?code=Sa9ndhuecg9g_AAAAAAATVYE';
 
 /* ══════════════════════════════════════════════════════════
    STORAGE HELPERS
 ══════════════════════════════════════════════════════════ */
-function getUsers()          { try { return JSON.parse(localStorage.getItem('pr_users') || '{}'); } catch(e) { return {}; } }
-function saveUsers(u)        { localStorage.setItem('pr_users', JSON.stringify(u)); }
-function getSession()        { try { return JSON.parse(localStorage.getItem('pr_sess') || 'null'); } catch(e) { return null; } }
-function saveSession(s)      { localStorage.setItem('pr_sess', JSON.stringify(s)); }
-function clearSession()      { localStorage.removeItem('pr_sess'); }
-function hasPaid(email)      { try { const u = getUsers(); return !!(u[email] && u[email].paymentId); } catch(e) { return false; } }
+function getUsers()     { try { return JSON.parse(localStorage.getItem('pr_users') || '{}'); } catch(e) { return {}; } }
+function saveUsers(u)   { localStorage.setItem('pr_users', JSON.stringify(u)); }
+function getSession()   { try { return JSON.parse(localStorage.getItem('pr_sess') || 'null'); } catch(e) { return null; } }
+function saveSession(s) { localStorage.setItem('pr_sess', JSON.stringify(s)); }
+function clearSession() { localStorage.removeItem('pr_sess'); }
+function hasPaid(email) { try { const u = getUsers(); return !!(u[email] && u[email].paymentId); } catch(e) { return false; } }
 function savePayment(email, paymentId) {
   const u = getUsers();
   if (u[email]) { u[email].paymentId = paymentId; saveUsers(u); }
@@ -637,7 +646,7 @@ function doSignup() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   AUTH — SIGN IN (2nd+ login requires Razorpay payment)
+   AUTH — SIGN IN (2nd+ login requires Cashfree payment)
 ══════════════════════════════════════════════════════════ */
 function doLogin() {
   const email = document.getElementById('login-email').value.trim().toLowerCase();
@@ -646,16 +655,16 @@ function doLogin() {
   if (!pass)  return showErr('login-err', 'Please enter your password.');
   const users = getUsers();
   const u = users[email];
-  if (!u)                          return showErr('login-err', 'No account found. Please sign up first.');
-  if (u.h !== hashPass(pass))      return showErr('login-err', 'Incorrect password. Try again.');
+  if (!u)                     return showErr('login-err', 'No account found. Please sign up first.');
+  if (u.h !== hashPass(pass)) return showErr('login-err', 'Incorrect password. Try again.');
   u.logins = (u.logins || 0) + 1;
   saveUsers(users);
   saveSession({ email, name: u.name });
 
   if (u.logins >= 2 && !hasPaid(email)) {
-    hideAuth(true);   // show Razorpay payment
+    hideAuth(true);  // show Cashfree payment
   } else {
-    hideAuth(false);  // go straight to site
+    hideAuth(false); // go straight to site
   }
 }
 
@@ -705,85 +714,30 @@ function openPaymentOverlay() {
   }
   document.getElementById('pay-step1').style.display = 'block';
   document.getElementById('pay-step3').style.display = 'none';
+  document.getElementById('pay-confirm-area').style.display = 'none';
   document.getElementById('payment-overlay').classList.add('show');
 }
 
 /* ══════════════════════════════════════════════════════════
-   ✅ RAZORPAY — OPEN CHECKOUT
+   CASHFREE — OPEN PAYMENT LINK IN NEW TAB
+   Then show "I've completed the payment" confirmation button
 ══════════════════════════════════════════════════════════ */
-function openRazorpay() {
-  const s = getSession();
-
-  const options = {
-    /* ── Your Razorpay Key ID ── */
-    key: RAZORPAY_KEY,
-
-    /* ── Payment details ── */
-    amount:   PAYMENT_AMOUNT,      // in paise  (₹10 = 1000)
-    currency: PAYMENT_CURRENCY,
-
-    /* ── Branding ── */
-    name:        'PhenilRoopa.ai',
-    description: 'Full Access — One-time Fee',
-    // image: 'https://your-logo-url.png',  // optional logo
-
-    /* ── Pre-fill user details ── */
-    prefill: {
-      name:    s ? s.name  : '',
-      email:   s ? s.email : '',
-      contact: ''                  // optional phone number
-    },
-
-    /* ── Theme color ── */
-    theme: { color: '#7c5cfc' },
-
-    /* ── ✅ SUCCESS HANDLER ── */
-    handler: function(response) {
-      /*
-        After successful payment Razorpay gives you:
-        response.razorpay_payment_id  ← unique payment ID
-        response.razorpay_order_id    ← if using Orders API
-        response.razorpay_signature   ← for server-side verification
-      */
-      console.log('✅ Payment success:', response);
-      onPaymentSuccess(response.razorpay_payment_id);
-    },
-
-    /* ── Modal dismissed by user ── */
-    modal: {
-      ondismiss: function() {
-        console.log('ℹ️ Payment modal closed by user');
-      }
-    }
-  };
-
-  const rzp = new Razorpay(options);
-
-  /* ── ❌ FAILURE HANDLER ── */
-  rzp.on('payment.failed', function(response) {
-    console.error('❌ Payment failed:', response.error);
-    alert(
-      'Payment failed!\n\n' +
-      'Reason: ' + response.error.description + '\n\n' +
-      'Please try again.'
-    );
-  });
-
-  rzp.open();
+function onCashfreeClick() {
+  // Show the confirmation button after a short delay
+  setTimeout(() => {
+    document.getElementById('pay-confirm-area').style.display = 'block';
+  }, 1500);
 }
 
 /* ══════════════════════════════════════════════════════════
-   ✅ ON PAYMENT SUCCESS
+   ON PAYMENT SUCCESS
 ══════════════════════════════════════════════════════════ */
 function onPaymentSuccess(paymentId) {
-  // Save payment ID to localStorage (replaces old UTR system)
   const s = getSession();
   if (s) savePayment(s.email, paymentId);
 
-  // Show success screen
   document.getElementById('pay-step1').style.display = 'none';
   document.getElementById('pay-step3').style.display = 'block';
-  document.getElementById('pay-success-id').textContent = 'Payment ID: ' + paymentId;
 
   // Auto-close overlay after 2.5 seconds
   setTimeout(() => {
@@ -796,18 +750,16 @@ function onPaymentSuccess(paymentId) {
 ══════════════════════════════════════════════════════════ */
 (function init() {
   const s = getSession();
-  if (!s) return; // show auth overlay (default)
+  if (!s) return;
 
-  // User is logged in
   document.getElementById('auth-overlay').style.display = 'none';
   renderNavUser();
 
-  // Check if they need to pay
   if (!hasPaid(s.email)) {
     const users = getUsers();
     const u = users[s.email];
     if (u && u.logins >= 2) {
-      openPaymentOverlay(); // returning user who hasn't paid
+      openPaymentOverlay();
     }
   }
 })();
@@ -824,12 +776,12 @@ document.getElementById('signup-name').addEventListener('keydown', e => { if(e.k
 /* ══════════════════════════════════════════════════════════
    CHAT / LIVE DEMO
 ══════════════════════════════════════════════════════════ */
-const BACKEND    = 'https://phenilroopa-backend.onrender.com/chat';
-let demoHistory  = [];
-let demoLoading  = false;
-const demoInput  = document.getElementById('demo-input');
+const BACKEND     = 'https://phenilroopa-backend.onrender.com/chat';
+let demoHistory   = [];
+let demoLoading   = false;
+const demoInput   = document.getElementById('demo-input');
 const demoSendBtn = document.getElementById('demo-send');
-const demoMsgs   = document.getElementById('demo-msgs');
+const demoMsgs    = document.getElementById('demo-msgs');
 
 demoInput.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); demoSend(); } });
 function demoChip(el) { demoInput.value = el.textContent; demoSend(); }
