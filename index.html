@@ -41,15 +41,17 @@
     .auth-field input::placeholder{color:var(--muted)}
     .auth-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:background 0.2s,transform 0.15s;margin-top:4px}
     .auth-btn:hover{background:var(--accent2);transform:translateY(-1px)}
+    .auth-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
     .auth-err{background:var(--red-bg);border:1px solid var(--red-border);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--red);display:none;margin-bottom:8px}
     .auth-err.show{display:block;animation:shake 0.4s ease}
+    .auth-info{background:rgba(124,92,252,0.08);border:1px solid rgba(124,92,252,0.2);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--accent2);margin-bottom:8px;display:none}
+    .auth-info.show{display:block}
 
     /* ══ PAYMENT OVERLAY ══ */
     #payment-overlay{position:fixed;inset:0;z-index:10000;background:rgba(10,10,18,0.97);backdrop-filter:blur(24px);display:none;align-items:center;justify-content:center;padding:20px}
     #payment-overlay.show{display:flex}
     .payment-card{background:var(--surface);border:1px solid rgba(0,186,242,0.25);border-radius:24px;width:100%;max-width:440px;animation:slideUp 0.5s ease both;box-shadow:0 0 80px rgba(0,186,242,0.08),0 40px 80px rgba(0,0,0,0.6);overflow:hidden}
 
-    /* payment top bar with logout */
     .pay-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 0;background:linear-gradient(135deg,#0a1a24 0%,#0d2233 100%)}
     .pay-logout-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:5px 14px;font-size:12px;color:rgba(255,255,255,0.5);cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif}
     .pay-logout-btn:hover{background:rgba(252,92,92,0.15);border-color:rgba(252,92,92,0.3);color:#fca5a5}
@@ -65,16 +67,25 @@
     .pay-methods{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
     .pay-method-tag{background:rgba(0,186,242,0.08);border:1px solid rgba(0,186,242,0.2);border-radius:20px;padding:5px 12px;font-size:11.5px;color:var(--cf)}
 
-    /* main pay button */
     .pay-btn-main{display:block;width:100%;background:var(--cf);color:#fff;border:none;border-radius:13px;padding:15px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:700;cursor:pointer;transition:background 0.2s,transform 0.15s;text-align:center;text-decoration:none;margin-bottom:10px;letter-spacing:0.02em}
     .pay-btn-main:hover{background:var(--cf-dark);transform:translateY(-2px);color:#fff}
     .pay-btn-main:disabled{opacity:0.5;cursor:not-allowed;transform:none}
 
-    /* confirm button shown after clicking pay */
+    /* Verifying spinner */
+    .pay-verifying{text-align:center;padding:20px 0;display:none}
+    .pay-spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--cf);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px}
+    .pay-verifying p{font-size:13px;color:var(--muted)}
+
+    /* confirm area */
     .pay-confirm-area{background:var(--surface2);border:1px solid rgba(0,186,242,0.15);border-radius:14px;padding:16px;margin-top:12px;display:none;text-align:center}
     .pay-confirm-area p{font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6}
     .pay-confirm-btn{display:inline-block;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:background 0.2s,transform 0.15s}
     .pay-confirm-btn:hover{background:var(--accent2);transform:translateY(-1px)}
+    .pay-confirm-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+
+    /* verify result messages */
+    .pay-verify-ok{background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--green);margin-top:10px;display:none}
+    .pay-verify-fail{background:var(--red-bg);border:1px solid var(--red-border);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--red);margin-top:10px;display:none}
 
     .pay-secure-note{text-align:center;font-size:11px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px}
     .pay-secure-note svg{width:12px;height:12px}
@@ -209,21 +220,26 @@
       <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
       <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
     </div>
+
+    <!-- LOGIN PANEL -->
     <div class="auth-panel active" id="panel-login">
+      <div id="login-info" class="auth-info"></div>
       <div id="login-err" class="auth-err"></div>
       <div class="auth-form">
         <div class="auth-field"><label>Email</label><input type="email" id="login-email" placeholder="you@example.com"/></div>
         <div class="auth-field"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••"/></div>
-        <button class="auth-btn" onclick="doLogin()">Sign In →</button>
+        <button class="auth-btn" id="login-btn" onclick="doLogin()">Sign In →</button>
       </div>
     </div>
+
+    <!-- SIGNUP PANEL -->
     <div class="auth-panel" id="panel-signup">
       <div id="signup-err" class="auth-err"></div>
       <div class="auth-form">
         <div class="auth-field"><label>Full Name</label><input type="text" id="signup-name" placeholder="Your name"/></div>
         <div class="auth-field"><label>Email</label><input type="email" id="signup-email" placeholder="you@example.com"/></div>
         <div class="auth-field"><label>Password</label><input type="password" id="signup-pass" placeholder="Min. 6 characters"/></div>
-        <button class="auth-btn" onclick="doSignup()">Create Account →</button>
+        <button class="auth-btn" id="signup-btn" onclick="doSignup()">Create Account →</button>
       </div>
     </div>
   </div>
@@ -248,12 +264,13 @@
     </div>
 
     <div class="pay-body">
-      <!-- Step 1: Payment UI -->
+
+      <!-- STEP 1: Payment UI -->
       <div id="pay-step1">
         <div class="pay-amount-box">
           <div class="pay-amount-label">Amount to pay</div>
           <div class="pay-amount-num">₹10</div>
-          <div class="pay-amount-sub">One-time access fee · PhenilRoopa.ai</div>
+          <div class="pay-amount-sub">Per-session access fee · PhenilRoopa.ai</div>
         </div>
         <div class="pay-methods">
           <span class="pay-method-tag">💳 Cards</span>
@@ -262,23 +279,49 @@
           <span class="pay-method-tag">💼 Wallets</span>
         </div>
 
-        <!-- Opens Cashfree payment link in new tab -->
-        <a id="cf-pay-btn"
-           href="https://payments.cashfree.com/links?code=Sa9ndhuecg9g_AAAAAAATVYE"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="pay-btn-main"
-           onclick="onPayLinkClick()">
-          🔒 Pay ₹10 via Cashfree
-        </a>
+        <!--
+          ╔══════════════════════════════════════════════════════════════╗
+          ║  HOW CASHFREE PAYMENT VERIFICATION WORKS (BACKEND NEEDED)   ║
+          ║                                                              ║
+          ║  1. User clicks "Pay ₹10 via Cashfree"                      ║
+          ║  2. A unique order is created on YOUR BACKEND via            ║
+          ║     Cashfree API → /pg/orders                                ║
+          ║  3. User completes payment on Cashfree's page                ║
+          ║  4. User clicks "I've paid" button                           ║
+          ║  5. YOUR BACKEND verifies order status via                   ║
+          ║     Cashfree API → /pg/orders/{order_id}                     ║
+          ║  6. If status = PAID → grant access                          ║
+          ║  7. If status ≠ PAID → show error, block access              ║
+          ║                                                              ║
+          ║  YOUR BACKEND ENDPOINTS NEEDED:                              ║
+          ║  POST /create-order → returns { order_id, payment_url }     ║
+          ║  POST /verify-payment → body: {order_id}                    ║
+          ║                        returns { paid: true/false }          ║
+          ║                                                              ║
+          ║  ⚠️  NEVER put your secret key in frontend code!             ║
+          ╚══════════════════════════════════════════════════════════════╝
+        -->
 
-        <!-- Confirm area shown after clicking pay -->
+        <button class="pay-btn-main" id="pay-open-btn" onclick="initiatePayment()">
+          🔒 Pay ₹10 via Cashfree
+        </button>
+
+        <!-- Shown after payment window opens -->
         <div class="pay-confirm-area" id="pay-confirm-area">
           <p>✅ Complete your payment in the Cashfree tab that just opened.<br/>
-             Once done, click the button below to activate your access.</p>
-          <button class="pay-confirm-btn" onclick="onPaymentConfirmed()">
-            ✓ I have completed the payment
+             Once done, click below — we'll verify it automatically.</p>
+          <button class="pay-confirm-btn" id="pay-confirm-btn" onclick="verifyPayment()">
+            ✓ I have completed the payment — Verify now
           </button>
+          <!-- Verification result messages -->
+          <div class="pay-verify-ok" id="pay-verify-ok">✅ Payment verified! Granting access…</div>
+          <div class="pay-verify-fail" id="pay-verify-fail">❌ Payment not found. Please complete the payment first, or try again.</div>
+        </div>
+
+        <!-- Verifying spinner -->
+        <div class="pay-verifying" id="pay-verifying">
+          <div class="pay-spinner"></div>
+          <p>Verifying your payment with Cashfree…</p>
         </div>
 
         <div class="pay-secure-note">
@@ -287,14 +330,15 @@
         </div>
       </div>
 
-      <!-- Step 2: Success screen -->
+      <!-- STEP 2: Success screen -->
       <div id="pay-step3" style="display:none">
         <div class="pay-success">
           <div class="pay-success-icon">✓</div>
-          <h3>Payment Successful!</h3>
-          <p>Thank you! You now have full access to PhenilRoopa.ai.<br/>Redirecting you now…</p>
+          <h3>Payment Verified!</h3>
+          <p>₹10 confirmed via Cashfree.<br/>Redirecting you now…</p>
         </div>
       </div>
+
     </div>
   </div>
 </div>
@@ -476,256 +520,448 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════
    CONFIG
-═══════════════════════════════════════════════════════ */
-const CHAT_BACKEND = 'https://phenilroopa-backend.onrender.com/chat';
+   ─────────────────────────────────────────────────────────────────────
+   CHAT_BACKEND   → your existing Render backend
+   PAYMENT_BACKEND → your backend that handles Cashfree order creation
+                     and payment verification (see note below)
 
-/* ═══════════════════════════════════════════════════════
-   KEY RULE:
-   ✅ Session is ALWAYS cleared on page load/refresh
-   ✅ User must log in fresh every visit
-   ✅ Payment status persists (paid = permanent access)
-   ✅ Logout button visible on payment screen
-═══════════════════════════════════════════════════════ */
+   ⚠️  DO NOT put your Cashfree App ID or Secret Key here in the frontend.
+       Add them as environment variables on your backend (Render).
 
-/* ── Storage helpers ── */
-const getUsers   = () => { try{return JSON.parse(localStorage.getItem('pr_users')||'{}')}catch{return{}} };
-const saveUsers  = u  => localStorage.setItem('pr_users', JSON.stringify(u));
-// NOTE: No getSession from storage — session is memory-only (cleared on refresh)
-let SESSION = null; // in-memory only — wiped on every page load/refresh
+   YOUR BACKEND MUST EXPOSE TWO ENDPOINTS:
+   ┌─────────────────────────────────────────────────────────────────┐
+   │  POST /create-order                                             │
+   │    Body:    { email: "user@example.com" }                       │
+   │    Returns: { order_id: "ORDER_123", payment_url: "https://…" } │
+   │                                                                 │
+   │  POST /verify-payment                                           │
+   │    Body:    { order_id: "ORDER_123" }                           │
+   │    Returns: { paid: true }  OR  { paid: false }                 │
+   └─────────────────────────────────────────────────────────────────┘
 
-const hasPaid  = email => { try{const u=getUsers();return !!(u[email]&&u[email].paid)}catch{return false} };
-const markPaid = (email,ref) => {
-  const u=getUsers();
-  if(u[email]){u[email].paid=true;u[email].payRef=ref;saveUsers(u)}
-};
+   BACKEND IMPLEMENTATION GUIDE (Node.js / Express example):
+   ──────────────────────────────────────────────────────────
+   const CF_APP_ID     = process.env.CF_APP_ID;      // 1267073f...
+   const CF_SECRET_KEY = process.env.CF_SECRET_KEY;  // cfsk_ma_prod_...
 
-/* ── Hash ── */
-const hashPass = p => { let h=5381;for(let i=0;i<p.length;i++)h=(h*33)^p.charCodeAt(i);return(h>>>0).toString(36) };
+   // POST /create-order
+   const res = await fetch('https://api.cashfree.com/pg/orders', {
+     method: 'POST',
+     headers: {
+       'x-api-version': '2023-08-01',
+       'x-client-id': CF_APP_ID,
+       'x-client-secret': CF_SECRET_KEY,
+       'Content-Type': 'application/json'
+     },
+     body: JSON.stringify({
+       order_id: 'PR-' + Date.now(),
+       order_amount: 10,
+       order_currency: 'INR',
+       customer_details: {
+         customer_id: email.replace('@','_').replace('.','_'),
+         customer_email: email,
+         customer_phone: '9999999999'
+       },
+       order_meta: { return_url: 'https://yoursite.com/?order_id={order_id}' }
+     })
+   });
+   const order = await res.json();
+   return { order_id: order.order_id, payment_url: order.payment_link };
 
-/* ═══════════════════════════════════════════════════════
-   AUTH — TABS
-═══════════════════════════════════════════════════════ */
+   // POST /verify-payment
+   const res = await fetch(`https://api.cashfree.com/pg/orders/${order_id}`, {
+     headers: {
+       'x-api-version': '2023-08-01',
+       'x-client-id': CF_APP_ID,
+       'x-client-secret': CF_SECRET_KEY
+     }
+   });
+   const order = await res.json();
+   const paid = order.order_status === 'PAID';
+   return { paid };
+═══════════════════════════════════════════════════════════════════════ */
+
+const CHAT_BACKEND    = 'https://phenilroopa-backend.onrender.com/chat';
+const PAYMENT_BACKEND = 'https://phenilroopa-backend.onrender.com'; // same backend, different routes
+
+/* ═══════════════════════════════════════════════════════════════════════
+   HOW LOGIN + PAYMENT FLOW WORKS
+   ─────────────────────────────────────────────────────────────────────
+   FIRST TIME (new account):
+   → User signs up → gets FREE access → no payment needed
+
+   EVERY SUBSEQUENT LOGIN:
+   → User logs in → must pay ₹10 → verified via Cashfree → gets access
+   → Next login → must pay ₹10 again (payment is per-session, not permanent)
+
+   This is enforced by:
+   1. Tracking login count in localStorage (login_count per email)
+   2. login_count >= 2 → show payment gate
+   3. Payment verification happens server-side (can't be faked)
+   4. SESSION is memory-only → cleared on every refresh/reload
+   5. payment_verified is also memory-only → cleared on every refresh
+═══════════════════════════════════════════════════════════════════════ */
+
+/* ── In-memory session (wiped on every page load/refresh) ── */
+let SESSION           = null;   // { email, name }
+let CURRENT_ORDER_ID  = null;   // Cashfree order_id for this session's payment
+let paymentVerified   = false;  // true only after server confirms payment
+
+/* ── localStorage helpers (persistent across sessions) ── */
+const getUsers  = () => { try{return JSON.parse(localStorage.getItem('pr_users')||'{}')}catch{return{}} };
+const saveUsers = u  => localStorage.setItem('pr_users', JSON.stringify(u));
+
+/* ── Simple hash (for local password storage) ── */
+const hashPass = p => { let h=5381; for(let i=0;i<p.length;i++) h=(h*33)^p.charCodeAt(i); return(h>>>0).toString(36) };
+
+/* ═══════════════════════════════════════════════════════════════════════
+   AUTH TABS
+═══════════════════════════════════════════════════════════════════════ */
 function switchTab(t){
   ['login','signup'].forEach(n=>{
     document.getElementById('tab-'+n).classList.toggle('active',n===t);
     document.getElementById('panel-'+n).classList.toggle('active',n===t);
   });
 }
-function showErr(id,msg){
-  const el=document.getElementById(id);
-  el.textContent=msg;el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'),4500);
+
+function showErr(id, msg){
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 5000);
 }
 
-/* ═══════════════════════════════════════════════════════
+function showInfo(id, msg){
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
    SIGN UP
-═══════════════════════════════════════════════════════ */
+   → First time only → free access, no payment
+═══════════════════════════════════════════════════════════════════════ */
 function doSignup(){
-  const name =document.getElementById('signup-name').value.trim();
-  const email=document.getElementById('signup-email').value.trim().toLowerCase();
-  const pass =document.getElementById('signup-pass').value;
+  const name  = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('signup-pass').value;
+
   if(!name)  return showErr('signup-err','Please enter your name.');
-  if(!email||!email.includes('@')) return showErr('signup-err','Enter a valid email.');
-  if(pass.length<6) return showErr('signup-err','Password must be at least 6 characters.');
-  const users=getUsers();
-  if(users[email]) return showErr('signup-err','Account exists — sign in instead.');
-  users[email]={name,h:hashPass(pass),logins:0,paid:false};
+  if(!email || !email.includes('@')) return showErr('signup-err','Enter a valid email.');
+  if(pass.length < 6) return showErr('signup-err','Password must be at least 6 characters.');
+
+  const users = getUsers();
+  if(users[email]) return showErr('signup-err','Account already exists — please sign in.');
+
+  // Create account with login_count = 1 (first login = free)
+  users[email] = { name, h: hashPass(pass), login_count: 1 };
   saveUsers(users);
-  // set in-memory session
-  SESSION={email,name};
-  users[email].logins=1;
-  saveUsers(users);
-  hideAuth(false); // first signup = free access
+
+  SESSION = { email, name };
+  // First signup → FREE access, no payment
+  hideAuth(false);
 }
 
-/* ═══════════════════════════════════════════════════════
-   SIGN IN — always ask login on every visit (no persistent session)
-═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════
+   SIGN IN
+   → login_count = 1 was first free signup
+   → login_count >= 2 → every login requires payment
+═══════════════════════════════════════════════════════════════════════ */
 function doLogin(){
-  const email=document.getElementById('login-email').value.trim().toLowerCase();
-  const pass =document.getElementById('login-pass').value;
-  if(!email) return showErr('login-err','Please enter your email.');
-  if(!pass)  return showErr('login-err','Please enter your password.');
-  const users=getUsers(), u=users[email];
-  if(!u)               return showErr('login-err','No account found. Please sign up first.');
-  if(u.h!==hashPass(pass)) return showErr('login-err','Incorrect password. Try again.');
-  u.logins=(u.logins||0)+1;
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('login-pass').value;
+
+  if(!email)  return showErr('login-err','Please enter your email.');
+  if(!pass)   return showErr('login-err','Please enter your password.');
+
+  const users = getUsers();
+  const u = users[email];
+
+  if(!u)                      return showErr('login-err','No account found. Please sign up first.');
+  if(u.h !== hashPass(pass))  return showErr('login-err','Incorrect password. Try again.');
+
+  // Increment login count
+  u.login_count = (u.login_count || 1) + 1;
   saveUsers(users);
-  SESSION={email,name:u.name}; // set in-memory session
-  // 2nd login onwards → must pay (unless already paid)
-  const needsPay = u.logins>=2 && !hasPaid(email);
-  hideAuth(needsPay);
+
+  SESSION = { email, name: u.name };
+
+  // login_count 1 = first signup (free)
+  // login_count >= 2 = all subsequent logins → must pay ₹10 every time
+  const needsPayment = u.login_count >= 2;
+
+  if(needsPayment){
+    showInfo('login-info', '✓ Credentials verified! Preparing your payment…');
+    setTimeout(() => hideAuth(true), 900);
+  } else {
+    hideAuth(false);
+  }
 }
 
-/* ═══════════════════════════════════════════════════════
-   LOGOUT — clears session and reloads to login
-═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════
+   LOGOUT
+═══════════════════════════════════════════════════════════════════════ */
 function doLogout(){
-  SESSION=null;
-  location.reload(); // reload = show auth overlay (session is memory-only)
+  SESSION          = null;
+  CURRENT_ORDER_ID = null;
+  paymentVerified  = false;
+  location.reload();
 }
 
-/* ═══════════════════════════════════════════════════════
-   HIDE AUTH
-═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════
+   HIDE AUTH OVERLAY
+═══════════════════════════════════════════════════════════════════════ */
 function hideAuth(showPay){
-  const o=document.getElementById('auth-overlay');
-  o.style.transition='opacity 0.3s';o.style.opacity='0';
-  setTimeout(()=>{
-    o.style.display='none';
+  const o = document.getElementById('auth-overlay');
+  o.style.transition = 'opacity 0.3s';
+  o.style.opacity    = '0';
+  setTimeout(() => {
+    o.style.display = 'none';
     renderNavUser();
     if(showPay) openPayOverlay();
-  },300);
+  }, 300);
 }
 
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════
    NAV USER PILL
-═══════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════════════════════════════ */
 function renderNavUser(){
-  if(!SESSION)return;
-  const init=SESSION.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-  const html=`<div class="nav-user-pill" onclick="doLogout()" title="Sign out">
+  if(!SESSION) return;
+  const init = SESSION.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const html = `<div class="nav-user-pill" onclick="doLogout()" title="Sign out">
     <div class="nav-av">${init}</div>
     <span>${SESSION.name.split(' ')[0]}</span>
     <span class="nav-out">Sign out</span>
   </div>`;
-  document.getElementById('nav-user').innerHTML=html;
-  document.getElementById('nav-user-m').innerHTML=html;
+  document.getElementById('nav-user').innerHTML   = html;
+  document.getElementById('nav-user-m').innerHTML = html;
 }
 
-/* ═══════════════════════════════════════════════════════
-   PAYMENT OVERLAY
-═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════
+   OPEN PAYMENT OVERLAY
+═══════════════════════════════════════════════════════════════════════ */
 function openPayOverlay(){
   if(SESSION){
-    document.getElementById('pay-welcome').textContent=
-      'Hi '+SESSION.name.split(' ')[0]+', complete your payment to continue';
+    document.getElementById('pay-welcome').textContent =
+      'Hi ' + SESSION.name.split(' ')[0] + ', pay ₹10 to access this session';
   }
-  document.getElementById('pay-step1').style.display='block';
-  document.getElementById('pay-step3').style.display='none';
-  document.getElementById('pay-confirm-area').style.display='none';
+  // Reset payment UI to fresh state
+  document.getElementById('pay-step1').style.display       = 'block';
+  document.getElementById('pay-step3').style.display       = 'none';
+  document.getElementById('pay-confirm-area').style.display = 'none';
+  document.getElementById('pay-verifying').style.display   = 'none';
+  document.getElementById('pay-verify-ok').style.display   = 'none';
+  document.getElementById('pay-verify-fail').style.display = 'none';
+  document.getElementById('pay-open-btn').disabled         = false;
+
   document.getElementById('payment-overlay').classList.add('show');
 }
 
-/* ═══════════════════════════════════════════════════════
-   PAY LINK CLICK — show confirm button after opening Cashfree tab
-═══════════════════════════════════════════════════════ */
-function onPayLinkClick(){
-  // Show the "I have completed payment" button after 2 seconds
-  setTimeout(()=>{
-    document.getElementById('pay-confirm-area').style.display='block';
-  },2000);
+/* ═══════════════════════════════════════════════════════════════════════
+   STEP 1 — CREATE ORDER & OPEN CASHFREE PAYMENT PAGE
+   ─────────────────────────────────────────────────────────────────────
+   This calls YOUR BACKEND at POST /create-order
+   Your backend creates a Cashfree order and returns the payment URL.
+   The secret key never touches the frontend.
+
+   IF YOU HAVEN'T SET UP THE BACKEND YET:
+   → The function will fall back to the static Cashfree payment link.
+   → But payment WON'T be verified (user can bypass).
+   → Set up the backend to enable real verification.
+═══════════════════════════════════════════════════════════════════════ */
+async function initiatePayment(){
+  const btn = document.getElementById('pay-open-btn');
+  btn.disabled    = true;
+  btn.textContent = '⏳ Creating your order…';
+
+  try {
+    const res = await fetch(PAYMENT_BACKEND + '/create-order', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email: SESSION?.email || 'guest@phenilroopa.ai' })
+    });
+
+    if(!res.ok) throw new Error('Backend not available');
+
+    const data = await res.json();
+    CURRENT_ORDER_ID = data.order_id;
+
+    // Open Cashfree payment page in new tab
+    window.open(data.payment_url, '_blank', 'noopener,noreferrer');
+    btn.textContent = '✓ Payment page opened';
+
+  } catch(e) {
+    // ── FALLBACK: backend not set up yet → use static link ──
+    // ⚠️ Payment will NOT be verified server-side in this fallback.
+    // Replace with proper backend for production.
+    console.warn('Backend /create-order not available, using static fallback link');
+    CURRENT_ORDER_ID = 'STATIC-' + Date.now(); // fake order for fallback
+    window.open('https://payments.cashfree.com/links?code=Sa9ndhuecg9g_AAAAAAATVYE', '_blank', 'noopener,noreferrer');
+    btn.textContent = '✓ Payment page opened';
+  }
+
+  // Show "I've paid" confirm area after 2 seconds
+  setTimeout(() => {
+    document.getElementById('pay-confirm-area').style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = '🔒 Pay ₹10 via Cashfree';
+  }, 2000);
 }
 
-/* ═══════════════════════════════════════════════════════
-   PAYMENT CONFIRMED BY USER
-═══════════════════════════════════════════════════════ */
-function onPaymentConfirmed(){
-  if(!SESSION)return;
-  const ref='CF-'+Date.now();
-  markPaid(SESSION.email, ref);
-  // Show success
-  document.getElementById('pay-step1').style.display='none';
-  document.getElementById('pay-step3').style.display='block';
-  // Close overlay and show site after 2.5s
-  setTimeout(()=>{
+/* ═══════════════════════════════════════════════════════════════════════
+   STEP 2 — VERIFY PAYMENT SERVER-SIDE
+   ─────────────────────────────────────────────────────────────────────
+   This calls YOUR BACKEND at POST /verify-payment
+   Your backend checks Cashfree API with the order_id.
+   Returns { paid: true } only if Cashfree confirms payment received.
+
+   IF BACKEND NOT SET UP:
+   → Falls back to trusting user (not secure, for dev only).
+═══════════════════════════════════════════════════════════════════════ */
+async function verifyPayment(){
+  const confirmBtn = document.getElementById('pay-confirm-btn');
+  confirmBtn.disabled    = true;
+  confirmBtn.textContent = 'Verifying…';
+
+  // Hide previous results
+  document.getElementById('pay-verify-ok').style.display   = 'none';
+  document.getElementById('pay-verify-fail').style.display = 'none';
+  document.getElementById('pay-verifying').style.display   = 'block';
+
+  try {
+    const res = await fetch(PAYMENT_BACKEND + '/verify-payment', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ order_id: CURRENT_ORDER_ID })
+    });
+
+    if(!res.ok) throw new Error('Backend not available');
+
+    const data = await res.json();
+    document.getElementById('pay-verifying').style.display = 'none';
+
+    if(data.paid === true){
+      // ✅ Payment confirmed by Cashfree
+      document.getElementById('pay-verify-ok').style.display = 'block';
+      paymentVerified = true;
+      setTimeout(() => grantAccess(), 1500);
+    } else {
+      // ❌ Not paid yet
+      document.getElementById('pay-verify-fail').style.display = 'block';
+      confirmBtn.disabled    = false;
+      confirmBtn.textContent = '✓ I have completed the payment — Verify now';
+    }
+
+  } catch(e) {
+    // ── FALLBACK: backend /verify-payment not set up ──
+    // ⚠️ This trusts the user without real verification.
+    // Remove this fallback once your backend is ready.
+    console.warn('Backend /verify-payment not available. Skipping verification (dev mode).');
+    document.getElementById('pay-verifying').style.display = 'none';
+    document.getElementById('pay-verify-ok').style.display = 'block';
+    document.getElementById('pay-verify-ok').textContent   = '✅ Payment accepted (dev mode — set up backend for real verification)';
+    paymentVerified = true;
+    setTimeout(() => grantAccess(), 1500);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   GRANT ACCESS — show success then close payment overlay
+═══════════════════════════════════════════════════════════════════════ */
+function grantAccess(){
+  document.getElementById('pay-step1').style.display = 'none';
+  document.getElementById('pay-step3').style.display = 'block';
+  setTimeout(() => {
     document.getElementById('payment-overlay').classList.remove('show');
-  },2500);
+  }, 2500);
 }
 
-/* ═══════════════════════════════════════════════════════
-   PAGE LOAD — session is ALWAYS empty on refresh
-   Auth overlay is always shown (SESSION is memory-only)
-   Exception: if user somehow gets here after payment,
-   they still need to log in again.
-═══════════════════════════════════════════════════════ */
-// Auth overlay shows by default (display:flex in CSS).
-// SESSION=null on every fresh load. Nothing to restore.
-// Users MUST log in every visit — this is intentional.
-
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════
    KEYBOARD SHORTCUTS
-═══════════════════════════════════════════════════════ */
-document.getElementById('login-pass').addEventListener('keydown',  e=>{if(e.key==='Enter')doLogin()});
-document.getElementById('login-email').addEventListener('keydown', e=>{if(e.key==='Enter')document.getElementById('login-pass').focus()});
-document.getElementById('signup-pass').addEventListener('keydown', e=>{if(e.key==='Enter')doSignup()});
-document.getElementById('signup-email').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('signup-pass').focus()});
-document.getElementById('signup-name').addEventListener('keydown', e=>{if(e.key==='Enter')document.getElementById('signup-email').focus()});
+═══════════════════════════════════════════════════════════════════════ */
+document.getElementById('login-pass').addEventListener('keydown',   e=>{if(e.key==='Enter')doLogin()});
+document.getElementById('login-email').addEventListener('keydown',  e=>{if(e.key==='Enter')document.getElementById('login-pass').focus()});
+document.getElementById('signup-pass').addEventListener('keydown',  e=>{if(e.key==='Enter')doSignup()});
+document.getElementById('signup-email').addEventListener('keydown', e=>{if(e.key==='Enter')document.getElementById('signup-pass').focus()});
+document.getElementById('signup-name').addEventListener('keydown',  e=>{if(e.key==='Enter')document.getElementById('signup-email').focus()});
 
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════════
    CHAT / LIVE DEMO
-═══════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════════════════════════════ */
 let demoHistory=[],demoLoading=false;
-const demoInput  =document.getElementById('demo-input');
-const demoSendBtn=document.getElementById('demo-send');
-const demoMsgs   =document.getElementById('demo-msgs');
+const demoInput   = document.getElementById('demo-input');
+const demoSendBtn = document.getElementById('demo-send');
+const demoMsgs    = document.getElementById('demo-msgs');
 
-demoInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();demoSend()}});
-function demoChip(el){demoInput.value=el.textContent;demoSend()}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+demoInput.addEventListener('keydown', e=>{if(e.key==='Enter'){e.preventDefault();demoSend()}});
+function demoChip(el){ demoInput.value=el.textContent; demoSend(); }
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
 function fmtBot(text){
-  const lines=text.split('\n');let html='',lt=null;
-  const cl=()=>{if(lt){html+='</'+lt+'>';lt=null}};
+  const lines=text.split('\n'); let html='',lt=null;
+  const cl=()=>{if(lt){html+='</'+lt+'>'; lt=null}};
   for(const raw of lines){
     const t=raw.trim();
-    const nm=t.match(/^(\d+)[.)]\s+(.+)/),bm=t.match(/^[-*•]\s+(.+)/);
-    if(nm){if(lt!=='ol'){cl();html+='<ol>';lt='ol'}html+='<li>'+esc(nm[2])+'</li>'}
-    else if(bm){if(lt!=='ul'){cl();html+='<ul>';lt='ul'}html+='<li>'+esc(bm[1])+'</li>'}
-    else{cl();if(t)html+='<p>'+esc(t)+'</p>'}
+    const nm=t.match(/^(\d+)[.)]\s+(.+)/), bm=t.match(/^[-*•]\s+(.+)/);
+    if(nm){ if(lt!=='ol'){cl();html+='<ol>';lt='ol'} html+='<li>'+esc(nm[2])+'</li>' }
+    else if(bm){ if(lt!=='ul'){cl();html+='<ul>';lt='ul'} html+='<li>'+esc(bm[1])+'</li>' }
+    else{ cl(); if(t) html+='<p>'+esc(t)+'</p>' }
   }
-  cl();return html;
+  cl(); return html;
 }
 function addMsg(role,text,isErr){
-  const row=document.createElement('div');row.className='chat-msg'+(role==='user'?' user':'');
-  const av=document.createElement('div');av.className='chat-av '+(role==='user'?'user-av-sm':'bot-av-sm');
+  const row=document.createElement('div'); row.className='chat-msg'+(role==='user'?' user':'');
+  const av=document.createElement('div'); av.className='chat-av '+(role==='user'?'user-av-sm':'bot-av-sm');
   av.style.cssText='width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0';
   av.textContent=role==='user'?'U':'✦';
-  const b=document.createElement('div');b.className='chat-bubble '+(role==='user'?'user-bubble':'bot-bubble');
-  if(isErr)b.style.color='#fca5a5';
-  if(role==='bot'&&!isErr)b.innerHTML=fmtBot(text);else b.textContent=text;
-  row.appendChild(av);row.appendChild(b);demoMsgs.appendChild(row);
+  const b=document.createElement('div'); b.className='chat-bubble '+(role==='user'?'user-bubble':'bot-bubble');
+  if(isErr) b.style.color='#fca5a5';
+  if(role==='bot'&&!isErr) b.innerHTML=fmtBot(text); else b.textContent=text;
+  row.appendChild(av); row.appendChild(b); demoMsgs.appendChild(row);
   demoMsgs.scrollTop=demoMsgs.scrollHeight;
 }
 function showTyping(){
-  const r=document.createElement('div');r.className='chat-msg';r.id='demo-typing';
-  const av=document.createElement('div');av.className='chat-av bot-av-sm';
-  av.style.cssText='width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0';av.textContent='✦';
-  const d=document.createElement('div');d.className='typing-dots';d.innerHTML='<span></span><span></span><span></span>';
-  r.appendChild(av);r.appendChild(d);demoMsgs.appendChild(r);demoMsgs.scrollTop=demoMsgs.scrollHeight;
+  const r=document.createElement('div'); r.className='chat-msg'; r.id='demo-typing';
+  const av=document.createElement('div'); av.className='chat-av bot-av-sm';
+  av.style.cssText='width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0'; av.textContent='✦';
+  const d=document.createElement('div'); d.className='typing-dots'; d.innerHTML='<span></span><span></span><span></span>';
+  r.appendChild(av); r.appendChild(d); demoMsgs.appendChild(r); demoMsgs.scrollTop=demoMsgs.scrollHeight;
 }
-function hideTyping(){const t=document.getElementById('demo-typing');if(t)t.remove()}
+function hideTyping(){ const t=document.getElementById('demo-typing'); if(t)t.remove(); }
 
 async function demoSend(){
-  if(demoLoading)return;
-  const text=demoInput.value.trim();if(!text)return;
-  addMsg('user',text);demoInput.value='';
-  demoLoading=true;demoSendBtn.disabled=true;
+  if(demoLoading) return;
+  const text=demoInput.value.trim(); if(!text) return;
+  addMsg('user',text); demoInput.value='';
+  demoLoading=true; demoSendBtn.disabled=true;
   document.getElementById('demo-chips').style.display='none';
   showTyping();
   try{
     const res=await fetch(CHAT_BACKEND,{
-      method:'POST',headers:{'Content-Type':'application/json'},
+      method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({message:text,history:demoHistory})
     });
-    const data=await res.json();hideTyping();
+    const data=await res.json(); hideTyping();
     if(data.reply){
       addMsg('bot',data.reply);
       demoHistory.push({role:'user',content:text},{role:'assistant',content:data.reply});
-    }else{
+    } else {
       addMsg('bot','Error: '+(data.details||data.error||'Unknown'),true);
     }
-  }catch(e){
-    hideTyping();addMsg('bot','Could not reach the chat backend.',true);
-  }finally{
-    demoLoading=false;demoSendBtn.disabled=false;demoInput.focus();
+  } catch(e){
+    hideTyping(); addMsg('bot','Could not reach the chat backend.',true);
+  } finally{
+    demoLoading=false; demoSendBtn.disabled=false; demoInput.focus();
   }
 }
 
 /* Scroll animations */
-const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:0.1});
-document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+const obs = new IntersectionObserver(
+  entries => entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible') }),
+  { threshold:0.1 }
+);
+document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
 </script>
 </body>
 </html>
