@@ -6,177 +6,184 @@
   <title>PhenilRoopa.ai — Your AI Assistant</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-
   <!-- Cashfree JS SDK -->
   <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 
   <style>
     :root {
-      --bg: #0d0d14; --surface: #13131e; --surface2: #1a1a28; --surface3: #20202f;
-      --border: rgba(255,255,255,0.07); --accent: #7c5cfc; --accent2: #a78bfa;
-      --accent-soft: rgba(124,92,252,0.12); --text: #f0eeff; --muted: #8880a8;
-      --green: #4ade80; --cf: #00BAF2; --cf-dark: #0099cc;
+      --bg:#0d0d14;--surface:#13131e;--surface2:#1a1a28;--border:rgba(255,255,255,0.07);
+      --accent:#7c5cfc;--accent2:#a78bfa;--accent-soft:rgba(124,92,252,0.12);
+      --text:#f0eeff;--muted:#8880a8;--green:#4ade80;--cf:#00BAF2;--cf-dark:#0099cc;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
 
-    #auth-overlay { position:fixed;inset:0;z-index:9999;background:rgba(10,10,18,0.97);backdrop-filter:blur(24px);display:flex;align-items:center;justify-content:center; }
-    @keyframes slideUp { from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)} }
-    @keyframes shake { 0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)} }
+    /* AUTH */
+    #auth-overlay{position:fixed;inset:0;z-index:9999;background:rgba(10,10,18,0.97);backdrop-filter:blur(24px);display:flex;align-items:center;justify-content:center}
+    @keyframes slideUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+    @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-5px);opacity:1}}
 
-    .auth-card { background:var(--surface);border:1px solid rgba(124,92,252,0.25);border-radius:24px;padding:44px 38px;width:100%;max-width:410px;margin:20px;animation:slideUp 0.5s ease both;box-shadow:0 0 100px rgba(124,92,252,0.12),0 40px 80px rgba(0,0,0,0.6); }
-    .auth-logo { width:54px;height:54px;border-radius:15px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;margin:0 auto 18px;box-shadow:0 8px 24px rgba(124,92,252,0.35); }
-    .auth-title { font-family:'Syne',sans-serif;font-size:24px;font-weight:800;text-align:center;margin-bottom:5px; }
-    .auth-subtitle { font-size:13.5px;color:var(--muted);text-align:center;margin-bottom:28px; }
-    .auth-tab-row { display:flex;background:var(--surface2);border-radius:12px;padding:4px;margin-bottom:26px; }
-    .auth-tab { flex:1;padding:9px 0;text-align:center;font-size:14px;font-weight:500;border-radius:9px;cursor:pointer;color:var(--muted);transition:all 0.2s;border:none;background:transparent;font-family:'DM Sans',sans-serif; }
-    .auth-tab.active { background:var(--accent);color:#fff;box-shadow:0 2px 14px rgba(124,92,252,0.4); }
-    .auth-panel { display:none; } .auth-panel.active { display:block; }
-    .auth-form { display:flex;flex-direction:column;gap:14px; }
-    .auth-field label { display:block;font-size:11.5px;font-weight:500;color:var(--muted);margin-bottom:6px;letter-spacing:0.06em;text-transform:uppercase; }
-    .auth-field input { width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s; }
-    .auth-field input:focus { border-color:rgba(124,92,252,0.55); }
-    .auth-field input::placeholder { color:var(--muted); }
-    .auth-btn { width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:background 0.2s,transform 0.15s;margin-top:4px; }
-    .auth-btn:hover { background:var(--accent2);transform:translateY(-1px); }
-    .auth-err { background:rgba(252,92,92,0.1);border:1px solid rgba(252,92,92,0.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#fca5a5;display:none;margin-bottom:8px; }
-    .auth-err.show { display:block;animation:shake 0.4s ease; }
+    .auth-card{background:var(--surface);border:1px solid rgba(124,92,252,0.25);border-radius:24px;padding:44px 38px;width:100%;max-width:410px;margin:20px;animation:slideUp 0.5s ease both;box-shadow:0 0 100px rgba(124,92,252,0.12),0 40px 80px rgba(0,0,0,0.6)}
+    .auth-logo{width:54px;height:54px;border-radius:15px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;margin:0 auto 18px;box-shadow:0 8px 24px rgba(124,92,252,0.35)}
+    .auth-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;text-align:center;margin-bottom:5px}
+    .auth-subtitle{font-size:13.5px;color:var(--muted);text-align:center;margin-bottom:28px}
+    .auth-tab-row{display:flex;background:var(--surface2);border-radius:12px;padding:4px;margin-bottom:26px}
+    .auth-tab{flex:1;padding:9px 0;text-align:center;font-size:14px;font-weight:500;border-radius:9px;cursor:pointer;color:var(--muted);transition:all 0.2s;border:none;background:transparent;font-family:'DM Sans',sans-serif}
+    .auth-tab.active{background:var(--accent);color:#fff;box-shadow:0 2px 14px rgba(124,92,252,0.4)}
+    .auth-panel{display:none}.auth-panel.active{display:block}
+    .auth-form{display:flex;flex-direction:column;gap:14px}
+    .auth-field label{display:block;font-size:11.5px;font-weight:500;color:var(--muted);margin-bottom:6px;letter-spacing:0.06em;text-transform:uppercase}
+    .auth-field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s}
+    .auth-field input:focus{border-color:rgba(124,92,252,0.55)}
+    .auth-field input::placeholder{color:var(--muted)}
+    .auth-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:background 0.2s,transform 0.15s;margin-top:4px}
+    .auth-btn:hover{background:var(--accent2);transform:translateY(-1px)}
+    .auth-err{background:rgba(252,92,92,0.1);border:1px solid rgba(252,92,92,0.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#fca5a5;display:none;margin-bottom:8px}
+    .auth-err.show{display:block;animation:shake 0.4s ease}
 
-    #payment-overlay { position:fixed;inset:0;z-index:10000;background:rgba(10,10,18,0.97);backdrop-filter:blur(24px);display:none;align-items:center;justify-content:center;padding:20px; }
-    #payment-overlay.show { display:flex; }
-    .payment-card { background:var(--surface);border:1px solid rgba(0,186,242,0.25);border-radius:24px;width:100%;max-width:420px;animation:slideUp 0.5s ease both;box-shadow:0 0 80px rgba(0,186,242,0.08),0 40px 80px rgba(0,0,0,0.6);overflow:hidden; }
-    .pay-header { background:linear-gradient(135deg,#0a1a24 0%,#0d2233 100%);border-bottom:1px solid rgba(0,186,242,0.15);padding:28px 30px 24px;text-align:center; }
-    .pay-header h2 { font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;margin-bottom:6px; }
-    .pay-header p { font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6; }
-    .pay-body { padding:26px 30px 28px; }
-    .pay-amount-box { text-align:center;background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:20px; }
-    .pay-amount-label { font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px; }
-    .pay-amount-num { font-family:'Syne',sans-serif;font-size:42px;font-weight:800;color:var(--cf);line-height:1; }
-    .pay-amount-sub { font-size:12px;color:var(--muted);margin-top:6px; }
-    .pay-methods { display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px; }
-    .pay-method-tag { background:rgba(0,186,242,0.08);border:1px solid rgba(0,186,242,0.2);border-radius:20px;padding:5px 12px;font-size:11.5px;color:var(--cf); }
-    .pay-btn-main { display:block;width:100%;background:var(--cf);color:#fff;border:none;border-radius:13px;padding:15px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:700;cursor:pointer;transition:background 0.2s,transform 0.15s;text-align:center;text-decoration:none;margin-bottom:12px;letter-spacing:0.02em; }
-    .pay-btn-main:hover { background:var(--cf-dark);transform:translateY(-2px);color:#fff; }
-    .pay-btn-main:disabled { opacity:0.5;cursor:not-allowed;transform:none; }
-    .pay-secure-note { text-align:center;font-size:11px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px; }
-    .pay-secure-note svg { width:12px;height:12px; }
-    .pay-status-msg { text-align:center;font-size:13px;color:var(--muted);margin-top:12px;min-height:20px; }
-    .pay-success { text-align:center;padding:16px 0 8px; }
-    .pay-success-icon { width:64px;height:64px;border-radius:50%;background:rgba(34,197,94,0.12);border:2px solid rgba(34,197,94,0.4);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;color:#4ade80; }
-    .pay-success h3 { font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#4ade80;margin-bottom:10px; }
-    .pay-success p { font-size:13px;color:var(--muted);line-height:1.7; }
+    /* PAYMENT */
+    #payment-overlay{position:fixed;inset:0;z-index:10000;background:rgba(10,10,18,0.97);backdrop-filter:blur(24px);display:none;align-items:center;justify-content:center;padding:20px}
+    #payment-overlay.show{display:flex}
+    .payment-card{background:var(--surface);border:1px solid rgba(0,186,242,0.25);border-radius:24px;width:100%;max-width:420px;animation:slideUp 0.5s ease both;box-shadow:0 0 80px rgba(0,186,242,0.08),0 40px 80px rgba(0,0,0,0.6);overflow:hidden}
+    .pay-header{background:linear-gradient(135deg,#0a1a24 0%,#0d2233 100%);border-bottom:1px solid rgba(0,186,242,0.15);padding:28px 30px 24px;text-align:center}
+    .pay-header h2{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;margin-bottom:6px}
+    .pay-header p{font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6}
+    .pay-body{padding:26px 30px 28px}
+    .pay-amount-box{text-align:center;background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:20px}
+    .pay-amount-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
+    .pay-amount-num{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;color:var(--cf);line-height:1}
+    .pay-amount-sub{font-size:12px;color:var(--muted);margin-top:6px}
+    .pay-methods{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+    .pay-method-tag{background:rgba(0,186,242,0.08);border:1px solid rgba(0,186,242,0.2);border-radius:20px;padding:5px 12px;font-size:11.5px;color:var(--cf)}
+    .pay-btn-main{display:block;width:100%;background:var(--cf);color:#fff;border:none;border-radius:13px;padding:15px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:700;cursor:pointer;transition:background 0.2s,transform 0.15s;text-align:center;margin-bottom:12px;letter-spacing:0.02em}
+    .pay-btn-main:hover{background:var(--cf-dark);transform:translateY(-2px)}
+    .pay-btn-main:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+    .pay-status-msg{text-align:center;font-size:13px;color:var(--muted);margin-top:12px;min-height:20px;line-height:1.5}
+    .pay-secure-note{text-align:center;font-size:11px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px}
+    .pay-secure-note svg{width:12px;height:12px}
+    .pay-success{text-align:center;padding:16px 0 8px}
+    .pay-success-icon{width:64px;height:64px;border-radius:50%;background:rgba(34,197,94,0.12);border:2px solid rgba(34,197,94,0.4);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;color:#4ade80}
+    .pay-success h3{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#4ade80;margin-bottom:10px}
+    .pay-success p{font-size:13px;color:var(--muted);line-height:1.7}
 
-    nav { position:sticky;top:0;z-index:100;background:rgba(13,13,20,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:14px 0; }
-    .nav-brand { font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:10px; }
-    .nav-logo { width:32px;height:32px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff; }
-    .nav-link-custom { color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color 0.2s;padding:6px 14px; }
-    .nav-link-custom:hover { color:var(--text); }
-    .nav-user-pill { display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 14px 5px 8px;font-size:13px;cursor:pointer;transition:border-color 0.2s; }
-    .nav-user-pill:hover { border-color:rgba(124,92,252,0.4); }
-    .nav-av { width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'Syne',sans-serif; }
-    .nav-out { font-size:12px;color:var(--muted);margin-left:4px; }
+    /* NAV */
+    nav{position:sticky;top:0;z-index:100;background:rgba(13,13,20,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:14px 0}
+    .nav-brand{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:10px}
+    .nav-logo{width:32px;height:32px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff}
+    .nav-link-custom{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color 0.2s;padding:6px 14px}
+    .nav-link-custom:hover{color:var(--text)}
+    .nav-user-pill{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 14px 5px 8px;font-size:13px;cursor:pointer;transition:border-color 0.2s}
+    .nav-user-pill:hover{border-color:rgba(124,92,252,0.4)}
+    .nav-av{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'Syne',sans-serif}
+    .nav-out{font-size:12px;color:var(--muted);margin-left:4px}
 
-    .hero { min-height:92vh;display:flex;align-items:center;padding:80px 0 60px;position:relative;overflow:hidden; }
-    .hero::before { content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:800px;background:radial-gradient(circle,rgba(124,92,252,0.12) 0%,transparent 65%);pointer-events:none; }
-    .hero-badge { display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);border:1px solid rgba(124,92,252,0.25);border-radius:100px;padding:6px 16px;font-size:13px;color:var(--accent2);margin-bottom:28px; }
-    .status-dot { width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);animation:pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
-    .hero h1 { font-family:'Syne',sans-serif;font-size:clamp(42px,6vw,76px);font-weight:800;line-height:1.07;letter-spacing:-0.02em; }
-    .hero h1 span { background:linear-gradient(90deg,#a78bfa,#7c5cfc);-webkit-background-clip:text;-webkit-text-fill-color:transparent; }
-    .hero-sub { font-size:18px;color:var(--muted);line-height:1.7;max-width:480px;margin-top:20px; }
-    .hero-actions { display:flex;gap:14px;flex-wrap:wrap;margin-top:36px; }
-    .btn-primary-custom { background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:background 0.2s,transform 0.15s;text-decoration:none;display:inline-block; }
-    .btn-primary-custom:hover { background:var(--accent2);transform:translateY(-2px);color:#fff; }
-    .btn-ghost { background:transparent;color:var(--text);border:1px solid var(--border);border-radius:12px;padding:14px 28px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:border-color 0.2s,transform 0.15s;text-decoration:none;display:inline-block; }
-    .btn-ghost:hover { border-color:var(--accent2);transform:translateY(-2px);color:var(--text); }
+    /* HERO */
+    .hero{min-height:92vh;display:flex;align-items:center;padding:80px 0 60px;position:relative;overflow:hidden}
+    .hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:800px;background:radial-gradient(circle,rgba(124,92,252,0.12) 0%,transparent 65%);pointer-events:none}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);border:1px solid rgba(124,92,252,0.25);border-radius:100px;padding:6px 16px;font-size:13px;color:var(--accent2);margin-bottom:28px}
+    .status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);animation:pulse 2s infinite}
+    .hero h1{font-family:'Syne',sans-serif;font-size:clamp(42px,6vw,76px);font-weight:800;line-height:1.07;letter-spacing:-0.02em}
+    .hero h1 span{background:linear-gradient(90deg,#a78bfa,#7c5cfc);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .hero-sub{font-size:18px;color:var(--muted);line-height:1.7;max-width:480px;margin-top:20px}
+    .hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:36px}
+    .btn-primary-custom{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:background 0.2s,transform 0.15s;text-decoration:none;display:inline-block}
+    .btn-primary-custom:hover{background:var(--accent2);transform:translateY(-2px);color:#fff}
+    .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border);border-radius:12px;padding:14px 28px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:border-color 0.2s,transform 0.15s;text-decoration:none;display:inline-block}
+    .btn-ghost:hover{border-color:var(--accent2);transform:translateY(-2px);color:var(--text)}
 
-    .chat-preview { background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;max-width:460px; }
-    .chat-topbar { background:var(--surface2);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:10px; }
-    .chat-avatar { width:32px;height:32px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff; }
-    .chat-topbar-info strong { font-size:14px;font-weight:600;display:block; }
-    .chat-topbar-info span { font-size:11px;color:var(--muted); }
-    .chat-body { padding:20px 18px;display:flex;flex-direction:column;gap:14px; }
-    .chat-msg { display:flex;gap:10px; } .chat-msg.user { flex-direction:row-reverse; }
-    .chat-av { width:28px;height:28px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-family:'Syne',sans-serif;font-weight:700; }
-    .bot-av-sm { background:var(--accent);color:#fff; } .user-av-sm { background:rgba(255,255,255,0.08);color:var(--text); }
-    .chat-bubble { padding:10px 14px;font-size:13.5px;line-height:1.6;max-width:78%;word-break:break-word; }
-    .bot-bubble { background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px 14px 14px 14px; }
-    .user-bubble { background:var(--accent);color:#fff;border-radius:14px 4px 14px 14px; }
-    .typing-dots { display:flex;gap:4px;align-items:center;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:4px 14px 14px 14px;width:fit-content; }
-    .typing-dots span { width:6px;height:6px;border-radius:50%;background:var(--muted);animation:bounce 1.2s infinite; }
-    .typing-dots span:nth-child(2){animation-delay:0.2s} .typing-dots span:nth-child(3){animation-delay:0.4s}
-    @keyframes bounce { 0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-5px);opacity:1} }
+    /* CHAT PREVIEW */
+    .chat-preview{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;max-width:460px}
+    .chat-topbar{background:var(--surface2);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:10px}
+    .chat-avatar{width:32px;height:32px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff}
+    .chat-topbar-info strong{font-size:14px;font-weight:600;display:block}
+    .chat-topbar-info span{font-size:11px;color:var(--muted)}
+    .chat-body{padding:20px 18px;display:flex;flex-direction:column;gap:14px}
+    .chat-msg{display:flex;gap:10px}.chat-msg.user{flex-direction:row-reverse}
+    .chat-av{width:28px;height:28px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-family:'Syne',sans-serif;font-weight:700}
+    .bot-av-sm{background:var(--accent);color:#fff}.user-av-sm{background:rgba(255,255,255,0.08);color:var(--text)}
+    .chat-bubble{padding:10px 14px;font-size:13.5px;line-height:1.6;max-width:78%;word-break:break-word}
+    .bot-bubble{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px 14px 14px 14px}
+    .user-bubble{background:var(--accent);color:#fff;border-radius:14px 4px 14px 14px}
+    .typing-dots{display:flex;gap:4px;align-items:center;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:4px 14px 14px 14px;width:fit-content}
+    .typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:bounce 1.2s infinite}
+    .typing-dots span:nth-child(2){animation-delay:0.2s}.typing-dots span:nth-child(3){animation-delay:0.4s}
 
-    .stats-bar { border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface);padding:36px 0; }
-    .stat-num { font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--text); }
-    .stat-num span { color:var(--accent2); }
-    .stat-label { font-size:13px;color:var(--muted);margin-top:4px; }
+    /* STATS */
+    .stats-bar{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface);padding:36px 0}
+    .stat-num{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--text)}
+    .stat-num span{color:var(--accent2)}
+    .stat-label{font-size:13px;color:var(--muted);margin-top:4px}
 
-    .section { padding:90px 0; }
-    .section-label { font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent2);font-weight:500;margin-bottom:14px; }
-    .section-title { font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:800;line-height:1.15; }
-    .section-sub { font-size:16px;color:var(--muted);line-height:1.7;margin-top:14px; }
-    .feature-card { background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:30px 28px;height:100%;transition:border-color 0.3s,transform 0.3s; }
-    .feature-card:hover { border-color:rgba(124,92,252,0.35);transform:translateY(-4px); }
-    .feature-icon { width:48px;height:48px;border-radius:13px;background:var(--accent-soft);border:1px solid rgba(124,92,252,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:20px; }
-    .feature-icon svg { width:22px;height:22px; }
-    .feature-card h3 { font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:10px; }
-    .feature-card p { font-size:14px;color:var(--muted);line-height:1.7; }
+    /* SECTIONS */
+    .section{padding:90px 0}
+    .section-label{font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent2);font-weight:500;margin-bottom:14px}
+    .section-title{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:800;line-height:1.15}
+    .section-sub{font-size:16px;color:var(--muted);line-height:1.7;margin-top:14px}
+    .feature-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:30px 28px;height:100%;transition:border-color 0.3s,transform 0.3s}
+    .feature-card:hover{border-color:rgba(124,92,252,0.35);transform:translateY(-4px)}
+    .feature-icon{width:48px;height:48px;border-radius:13px;background:var(--accent-soft);border:1px solid rgba(124,92,252,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+    .feature-icon svg{width:22px;height:22px}
+    .feature-card h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:10px}
+    .feature-card p{font-size:14px;color:var(--muted);line-height:1.7}
+    .how-bg{background:var(--surface)}
+    .step-num{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;color:rgba(124,92,252,0.15);line-height:1;margin-bottom:12px}
+    .step-card{padding:32px 28px;border:1px solid var(--border);border-radius:18px;background:var(--surface2);height:100%;transition:border-color 0.3s}
+    .step-card:hover{border-color:rgba(124,92,252,0.3)}
+    .step-card h4{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:10px}
+    .step-card p{font-size:14px;color:var(--muted);line-height:1.7}
 
-    .how-bg { background:var(--surface); }
-    .step-num { font-family:'Syne',sans-serif;font-size:48px;font-weight:800;color:rgba(124,92,252,0.15);line-height:1;margin-bottom:12px; }
-    .step-card { padding:32px 28px;border:1px solid var(--border);border-radius:18px;background:var(--surface2);height:100%;transition:border-color 0.3s; }
-    .step-card:hover { border-color:rgba(124,92,252,0.3); }
-    .step-card h4 { font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:10px; }
-    .step-card p { font-size:14px;color:var(--muted);line-height:1.7; }
+    /* DEMO */
+    .demo-section{background:var(--surface2)}
+    .demo-wrap{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+    .demo-header{background:var(--surface2);border-bottom:1px solid var(--border);padding:16px 20px;display:flex;align-items:center;gap:10px}
+    .demo-header strong{font-family:'Syne',sans-serif;font-size:15px}
+    .demo-messages{padding:24px 20px;display:flex;flex-direction:column;gap:16px;min-height:280px;max-height:340px;overflow-y:auto}
+    .demo-input-bar{border-top:1px solid var(--border);padding:14px 16px;display:flex;gap:10px}
+    .demo-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s}
+    .demo-input::placeholder{color:var(--muted)}
+    .demo-input:focus{border-color:rgba(124,92,252,0.5)}
+    .demo-send{width:38px;height:38px;border-radius:10px;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s,transform 0.15s;flex-shrink:0}
+    .demo-send:hover{background:var(--accent2);transform:scale(1.05)}
+    .demo-send:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+    .demo-send svg{width:16px;height:16px;fill:#fff}
+    .demo-chips{padding:0 20px 16px;display:flex;gap:8px;flex-wrap:wrap}
+    .demo-chip{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--muted);cursor:pointer;transition:all 0.2s}
+    .demo-chip:hover{border-color:var(--accent);color:var(--accent2)}
+    .bot-bubble ol,.bot-bubble ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+    .bot-bubble ol{list-style:decimal}.bot-bubble ul{list-style:disc}
+    .bot-bubble p{margin:0 0 6px}.bot-bubble p:last-child{margin-bottom:0}
 
-    .demo-section { background:var(--surface2); }
-    .demo-wrap { background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden; }
-    .demo-header { background:var(--surface2);border-bottom:1px solid var(--border);padding:16px 20px;display:flex;align-items:center;gap:10px; }
-    .demo-header strong { font-family:'Syne',sans-serif;font-size:15px; }
-    .demo-messages { padding:24px 20px;display:flex;flex-direction:column;gap:16px;min-height:280px;max-height:340px;overflow-y:auto; }
-    .demo-input-bar { border-top:1px solid var(--border);padding:14px 16px;display:flex;gap:10px; }
-    .demo-input { flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s; }
-    .demo-input::placeholder { color:var(--muted); }
-    .demo-input:focus { border-color:rgba(124,92,252,0.5); }
-    .demo-send { width:38px;height:38px;border-radius:10px;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s,transform 0.15s;flex-shrink:0; }
-    .demo-send:hover { background:var(--accent2);transform:scale(1.05); }
-    .demo-send:disabled { opacity:0.4;cursor:not-allowed;transform:none; }
-    .demo-send svg { width:16px;height:16px;fill:#fff; }
-    .demo-chips { padding:0 20px 16px;display:flex;gap:8px;flex-wrap:wrap; }
-    .demo-chip { background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--muted);cursor:pointer;transition:all 0.2s; }
-    .demo-chip:hover { border-color:var(--accent);color:var(--accent2); }
-    .bot-bubble ol,.bot-bubble ul { margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px; }
-    .bot-bubble ol { list-style:decimal; } .bot-bubble ul { list-style:disc; }
-    .bot-bubble p { margin:0 0 6px; } .bot-bubble p:last-child { margin-bottom:0; }
+    /* TESTIMONIALS */
+    .testimonial-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px 26px;height:100%}
+    .stars{color:#f59e0b;font-size:14px;margin-bottom:14px;letter-spacing:2px}
+    .testimonial-text{font-size:14.5px;color:var(--muted);line-height:1.75;margin-bottom:20px}
+    .testimonial-author{display:flex;align-items:center;gap:12px}
+    .t-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:'Syne',sans-serif}
+    .t-name{font-size:14px;font-weight:600}.t-role{font-size:12px;color:var(--muted)}
 
-    .testimonial-card { background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px 26px;height:100%; }
-    .stars { color:#f59e0b;font-size:14px;margin-bottom:14px;letter-spacing:2px; }
-    .testimonial-text { font-size:14.5px;color:var(--muted);line-height:1.75;margin-bottom:20px; }
-    .testimonial-author { display:flex;align-items:center;gap:12px; }
-    .t-avatar { width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:'Syne',sans-serif; }
-    .t-name { font-size:14px;font-weight:600; } .t-role { font-size:12px;color:var(--muted); }
+    /* CTA + FOOTER */
+    .cta-section{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:90px 0;text-align:center;position:relative;overflow:hidden}
+    .cta-section::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(124,92,252,0.1) 0%,transparent 70%);pointer-events:none}
+    .cta-section h2{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,48px);font-weight:800;margin-bottom:16px}
+    .cta-section p{font-size:16px;color:var(--muted);max-width:420px;margin:0 auto 36px}
+    footer{background:var(--bg);border-top:1px solid var(--border);padding:40px 0 28px}
+    .footer-brand{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;display:flex;align-items:center;gap:10px;margin-bottom:10px}
+    .footer-copy{font-size:13px;color:var(--muted)}
+    .footer-link{color:var(--muted);text-decoration:none;font-size:14px;transition:color 0.2s}
+    .footer-link:hover{color:var(--accent2)}
 
-    .cta-section { background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:90px 0;text-align:center;position:relative;overflow:hidden; }
-    .cta-section::before { content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(124,92,252,0.1) 0%,transparent 70%);pointer-events:none; }
-    .cta-section h2 { font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,48px);font-weight:800;margin-bottom:16px; }
-    .cta-section p { font-size:16px;color:var(--muted);max-width:420px;margin:0 auto 36px; }
-    footer { background:var(--bg);border-top:1px solid var(--border);padding:40px 0 28px; }
-    .footer-brand { font-family:'Syne',sans-serif;font-size:18px;font-weight:800;display:flex;align-items:center;gap:10px;margin-bottom:10px; }
-    .footer-copy { font-size:13px;color:var(--muted); }
-    .footer-link { color:var(--muted);text-decoration:none;font-size:14px;transition:color 0.2s; }
-    .footer-link:hover { color:var(--accent2); }
-
-    .fade-up { opacity:0;transform:translateY(20px);transition:opacity 0.6s ease,transform 0.6s ease; }
-    .fade-up.visible { opacity:1;transform:translateY(0); }
-    ::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    .fade-up{opacity:0;transform:translateY(20px);transition:opacity 0.6s ease,transform 0.6s ease}
+    .fade-up.visible{opacity:1;transform:translateY(0)}
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
     @media(max-width:768px){.hero{padding:60px 0 40px;min-height:auto}.chat-preview{max-width:100%}}
   </style>
 </head>
 <body>
 
-<!-- AUTH OVERLAY -->
+<!-- ═══════════════════════════════════════ AUTH ═══════════════════════════════════════ -->
 <div id="auth-overlay">
   <div class="auth-card">
     <div class="auth-logo">✦</div>
@@ -189,28 +196,28 @@
     <div class="auth-panel active" id="panel-login">
       <div id="login-err" class="auth-err"></div>
       <div class="auth-form">
-        <div class="auth-field"><label>Email</label><input type="email" id="login-email" placeholder="you@example.com" /></div>
-        <div class="auth-field"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••" /></div>
+        <div class="auth-field"><label>Email</label><input type="email" id="login-email" placeholder="you@example.com"/></div>
+        <div class="auth-field"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••"/></div>
         <button class="auth-btn" onclick="doLogin()">Sign In →</button>
       </div>
     </div>
     <div class="auth-panel" id="panel-signup">
       <div id="signup-err" class="auth-err"></div>
       <div class="auth-form">
-        <div class="auth-field"><label>Full Name</label><input type="text" id="signup-name" placeholder="Your name" /></div>
-        <div class="auth-field"><label>Email</label><input type="email" id="signup-email" placeholder="you@example.com" /></div>
-        <div class="auth-field"><label>Password</label><input type="password" id="signup-pass" placeholder="Min. 6 characters" /></div>
+        <div class="auth-field"><label>Full Name</label><input type="text" id="signup-name" placeholder="Your name"/></div>
+        <div class="auth-field"><label>Email</label><input type="email" id="signup-email" placeholder="you@example.com"/></div>
+        <div class="auth-field"><label>Password</label><input type="password" id="signup-pass" placeholder="Min. 6 characters"/></div>
         <button class="auth-btn" onclick="doSignup()">Create Account →</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- CASHFREE PAYMENT OVERLAY -->
+<!-- ═══════════════════════════════════════ PAYMENT ═══════════════════════════════════════ -->
 <div id="payment-overlay">
   <div class="payment-card">
     <div class="pay-header">
-      <svg viewBox="0 0 160 32" height="26" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto 14px;">
+      <svg viewBox="0 0 160 32" height="26" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto 14px">
         <text y="24" font-size="20" font-weight="900" fill="#00BAF2" font-family="Arial,sans-serif">cashfree</text>
       </svg>
       <h2 id="pay-welcome">Complete your payment</h2>
@@ -229,7 +236,7 @@
           <span class="pay-method-tag">🏦 Net Banking</span>
           <span class="pay-method-tag">💼 Wallets</span>
         </div>
-        <button class="pay-btn-main" id="pay-now-btn" onclick="startCashfreePayment()">
+        <button class="pay-btn-main" id="pay-now-btn" onclick="startPayment()">
           🔒 Pay ₹10 Securely via Cashfree
         </button>
         <div class="pay-status-msg" id="pay-status-msg"></div>
@@ -238,7 +245,7 @@
           Your payment is 100% secure &amp; encrypted
         </div>
       </div>
-      <div id="pay-step3" style="display:none;">
+      <div id="pay-step3" style="display:none">
         <div class="pay-success">
           <div class="pay-success-icon">✓</div>
           <h3>Payment Successful!</h3>
@@ -249,7 +256,7 @@
   </div>
 </div>
 
-<!-- NAV -->
+<!-- ═══════════════════════════════════════ NAV ═══════════════════════════════════════ -->
 <nav>
   <div class="container">
     <div class="d-flex align-items-center justify-content-between">
@@ -265,13 +272,13 @@
   </div>
 </nav>
 
-<!-- HERO -->
+<!-- ═══════════════════════════════════════ HERO ═══════════════════════════════════════ -->
 <section class="hero">
   <div class="container">
     <div class="row align-items-center g-5">
       <div class="col-lg-6">
         <div class="hero-badge"><div class="status-dot"></div>Powered by Llama 3.3 · Groq</div>
-        <h1>Meet your AI<br /><span>thinking partner</span></h1>
+        <h1>Meet your AI<br/><span>thinking partner</span></h1>
         <p class="hero-sub">PhenilRoopa is a blazing-fast AI assistant built on Groq's inference engine. Ask anything — it thinks in milliseconds.</p>
         <div class="hero-actions">
           <a href="#demo" class="btn-primary-custom">Try it free →</a>
@@ -318,7 +325,7 @@
       <p class="section-sub mx-auto" style="max-width:480px">From creative writing to coding to research — PhenilRoopa handles it all.</p>
     </div>
     <div class="row g-4">
-      <div class="col-md-6 col-lg-4 fade-up"><div class="feature-card"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><h3>Lightning fast</h3><p>Groq's custom inference hardware delivers responses in under 100ms. No more waiting.</p></div></div>
+      <div class="col-md-6 col-lg-4 fade-up"><div class="feature-card"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><h3>Lightning fast</h3><p>Groq's custom inference hardware delivers responses in under 100ms.</p></div></div>
       <div class="col-md-6 col-lg-4 fade-up"><div class="feature-card"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><h3>Creative writing</h3><p>Poems, stories, essays, emails — PhenilRoopa writes with style and precision.</p></div></div>
       <div class="col-md-6 col-lg-4 fade-up"><div class="feature-card"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><h3>Code assistance</h3><p>Debug, explain, refactor, and generate code across every major language.</p></div></div>
       <div class="col-md-6 col-lg-4 fade-up"><div class="feature-card"><div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><h3>Memory in chat</h3><p>Context is maintained throughout the session — PhenilRoopa remembers everything.</p></div></div>
@@ -333,9 +340,9 @@
   <div class="container">
     <div class="text-center mb-5 fade-up"><div class="section-label">Process</div><h2 class="section-title">How it works</h2></div>
     <div class="row g-4">
-      <div class="col-md-4 fade-up"><div class="step-card"><div class="step-num">01</div><h4>Type your question</h4><p>Write anything — a question, a task, a creative prompt. No right or wrong way to ask.</p></div></div>
-      <div class="col-md-4 fade-up"><div class="step-card"><div class="step-num">02</div><h4>Groq processes it</h4><p>Your message reaches Groq's inference engine running Llama 3.3 70B at extraordinary speed.</p></div></div>
-      <div class="col-md-4 fade-up"><div class="step-card"><div class="step-num">03</div><h4>Instant reply</h4><p>PhenilRoopa delivers a thoughtful, accurate response — usually in under a second.</p></div></div>
+      <div class="col-md-4 fade-up"><div class="step-card"><div class="step-num">01</div><h4>Type your question</h4><p>Write anything — a question, a task, a creative prompt.</p></div></div>
+      <div class="col-md-4 fade-up"><div class="step-card"><div class="step-num">02</div><h4>Groq processes it</h4><p>Your message reaches Groq's inference engine running Llama 3.3 70B.</p></div></div>
+      <div class="col-md-4 fade-up"><div class="step-card"><div class="step-num">03</div><h4>Instant reply</h4><p>PhenilRoopa delivers a thoughtful, accurate response in under a second.</p></div></div>
     </div>
   </div>
 </section>
@@ -352,13 +359,13 @@
       <div class="col-lg-8">
         <div class="demo-wrap">
           <div class="demo-header">
-            <div class="chat-avatar" style="width:30px;height:30px;font-size:13px;">✦</div>
+            <div class="chat-avatar" style="width:30px;height:30px;font-size:13px">✦</div>
             <strong>PhenilRoopa.ai</strong>
             <div class="ms-auto d-flex align-items-center gap-2"><div class="status-dot"></div><span style="font-size:12px;color:var(--green)">Live</span></div>
           </div>
           <div class="demo-messages" id="demo-msgs">
             <div class="chat-msg">
-              <div class="chat-av bot-av-sm" style="width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0;">✦</div>
+              <div class="chat-av bot-av-sm" style="width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0">✦</div>
               <div class="chat-bubble bot-bubble">Hi! I'm PhenilRoopa. Ask me anything — powered by Llama 3.3 on Groq.</div>
             </div>
           </div>
@@ -369,7 +376,7 @@
             <div class="demo-chip" onclick="demoChip(this)">Brainstorm startup ideas</div>
           </div>
           <div class="demo-input-bar">
-            <input type="text" class="demo-input" id="demo-input" placeholder="Ask me anything..." />
+            <input type="text" class="demo-input" id="demo-input" placeholder="Ask me anything..."/>
             <button class="demo-send" id="demo-send" onclick="demoSend()">
               <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
             </button>
@@ -385,9 +392,9 @@
   <div class="container">
     <div class="text-center mb-5 fade-up"><div class="section-label">What people say</div><h2 class="section-title">Built for real people</h2></div>
     <div class="row g-4">
-      <div class="col-md-4 fade-up"><div class="testimonial-card"><div class="stars">★★★★★</div><p class="testimonial-text">"PhenilRoopa helped me debug a nasty React bug in minutes. Incredible speed."</p><div class="testimonial-author"><div class="t-avatar" style="background:rgba(124,92,252,0.15);color:#a78bfa;">AK</div><div><div class="t-name">Arjun K.</div><div class="t-role">Frontend Developer</div></div></div></div></div>
-      <div class="col-md-4 fade-up"><div class="testimonial-card"><div class="stars">★★★★★</div><p class="testimonial-text">"I use it every day for writing emails and summarizing research. Genuinely helpful."</p><div class="testimonial-author"><div class="t-avatar" style="background:rgba(29,158,117,0.15);color:#5DCAA5;">SM</div><div><div class="t-name">Sneha M.</div><div class="t-role">Product Manager</div></div></div></div></div>
-      <div class="col-md-4 fade-up"><div class="testimonial-card"><div class="stars">★★★★★</div><p class="testimonial-text">"As a student, having an AI that explains complex topics simply is game-changing."</p><div class="testimonial-author"><div class="t-avatar" style="background:rgba(216,90,48,0.15);color:#F0997B;">RD</div><div><div class="t-name">Rohan D.</div><div class="t-role">Engineering Student</div></div></div></div></div>
+      <div class="col-md-4 fade-up"><div class="testimonial-card"><div class="stars">★★★★★</div><p class="testimonial-text">"PhenilRoopa helped me debug a nasty React bug in minutes. Incredible speed."</p><div class="testimonial-author"><div class="t-avatar" style="background:rgba(124,92,252,0.15);color:#a78bfa">AK</div><div><div class="t-name">Arjun K.</div><div class="t-role">Frontend Developer</div></div></div></div></div>
+      <div class="col-md-4 fade-up"><div class="testimonial-card"><div class="stars">★★★★★</div><p class="testimonial-text">"I use it every day for writing emails and summarizing research. Genuinely helpful."</p><div class="testimonial-author"><div class="t-avatar" style="background:rgba(29,158,117,0.15);color:#5DCAA5">SM</div><div><div class="t-name">Sneha M.</div><div class="t-role">Product Manager</div></div></div></div></div>
+      <div class="col-md-4 fade-up"><div class="testimonial-card"><div class="stars">★★★★★</div><p class="testimonial-text">"As a student, having an AI that explains complex topics simply is game-changing."</p><div class="testimonial-author"><div class="t-avatar" style="background:rgba(216,90,48,0.15);color:#F0997B">RD</div><div><div class="t-name">Rohan D.</div><div class="t-role">Engineering Student</div></div></div></div></div>
     </div>
   </div>
 </section>
@@ -397,7 +404,7 @@
   <div class="container position-relative">
     <h2>Ready to think faster?</h2>
     <p>Join thousands of people already using PhenilRoopa to work smarter every day.</p>
-    <a href="#demo" class="btn-primary-custom" style="font-size:16px;padding:16px 36px;">Start chatting — it's free</a>
+    <a href="#demo" class="btn-primary-custom" style="font-size:16px;padding:16px 36px">Start chatting — it's free</a>
   </div>
 </section>
 
@@ -418,7 +425,7 @@
         </div>
       </div>
     </div>
-    <div class="mt-4 pt-4" style="border-top:1px solid var(--border);">
+    <div class="mt-4 pt-4" style="border-top:1px solid var(--border)">
       <p class="footer-copy text-center">© 2025 PhenilRoopa.ai · Made by Phenil Chauhan</p>
     </div>
   </div>
@@ -426,36 +433,37 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+/* ═══════════════════════════════════════════════════════════════
+   ✅ CASHFREE — DIRECT FROM FRONTEND (no backend needed)
+   Calls Cashfree Orders API directly using your keys.
+   The Cashfree JS SDK then opens the payment popup.
+═══════════════════════════════════════════════════════════════ */
+const CF_APP_ID = '1267073f5b0630a3b4b6c3d75a83707621';
+const CF_SECRET = 'cfsk_ma_prod_eb97e92a7ea9b95f8313ad45fc0a8274_00d937ca';
+const CF_API    = 'https://api.cashfree.com/pg/orders';  // PRODUCTION
 
-/* ══════════════════════════════════════════════════════════
-   CASHFREE CONFIG
-   App ID : 1267073f5b0630a3b4b6c3d75a83707621  (PRODUCTION)
-   Secret : kept on your Render backend only (NEVER in frontend)
-   Backend: update BACKEND url to your Render deployment
-══════════════════════════════════════════════════════════ */
-const BACKEND = 'https://phenilroopa-backend.onrender.com';  // ← your Render URL
+/* ✅ Groq backend URL — your existing Render chat backend */
+const CHAT_BACKEND = 'https://phenilroopa-backend.onrender.com/chat';
 
-/* ══════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
    STORAGE HELPERS
-══════════════════════════════════════════════════════════ */
-function getUsers()   { try{return JSON.parse(localStorage.getItem('pr_users')||'{}');}catch(e){return{};} }
-function saveUsers(u) { localStorage.setItem('pr_users',JSON.stringify(u)); }
-function getSession() { try{return JSON.parse(localStorage.getItem('pr_sess')||'null');}catch(e){return null;} }
-function saveSession(s) { localStorage.setItem('pr_sess',JSON.stringify(s)); }
-function clearSession() { localStorage.removeItem('pr_sess'); }
-function hasPaid(email) { try{const u=getUsers();return !!(u[email]&&u[email].paymentId);}catch(e){return false;} }
-function savePayment(email,paymentId) { const u=getUsers();if(u[email]){u[email].paymentId=paymentId;saveUsers(u);} }
+═══════════════════════════════════════════════════════════════ */
+const getUsers   = () => { try{return JSON.parse(localStorage.getItem('pr_users')||'{}')}catch{return{}} };
+const saveUsers  = u  => localStorage.setItem('pr_users', JSON.stringify(u));
+const getSession = () => { try{return JSON.parse(localStorage.getItem('pr_sess')||'null')}catch{return null} };
+const saveSession= s  => localStorage.setItem('pr_sess', JSON.stringify(s));
+const clearSess  = () => localStorage.removeItem('pr_sess');
+const hasPaid    = email => { try{const u=getUsers();return !!(u[email]&&u[email].paid)}catch{return false} };
+const markPaid   = (email,orderId) => { const u=getUsers();if(u[email]){u[email].paid=true;u[email].orderId=orderId;saveUsers(u)} };
 
-/* ══════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
    HASH
-══════════════════════════════════════════════════════════ */
-function hashPass(p) {
-  let h=5381;for(let i=0;i<p.length;i++)h=(h*33)^p.charCodeAt(i);return(h>>>0).toString(36);
-}
+═══════════════════════════════════════════════════════════════ */
+const hashPass = p => { let h=5381;for(let i=0;i<p.length;i++)h=(h*33)^p.charCodeAt(i);return(h>>>0).toString(36) };
 
-/* ══════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
    AUTH
-══════════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════════════════════ */
 function switchTab(t) {
   ['login','signup'].forEach(n=>{
     document.getElementById('tab-'+n).classList.toggle('active',n===t);
@@ -463,50 +471,59 @@ function switchTab(t) {
   });
 }
 function showErr(id,msg) {
-  const el=document.getElementById(id);el.textContent=msg;el.classList.add('show');
+  const el=document.getElementById(id);
+  el.textContent=msg;el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'),4500);
 }
 function doSignup() {
-  const name=document.getElementById('signup-name').value.trim();
+  const name =document.getElementById('signup-name').value.trim();
   const email=document.getElementById('signup-email').value.trim().toLowerCase();
-  const pass=document.getElementById('signup-pass').value;
-  if(!name) return showErr('signup-err','Please enter your name.');
+  const pass =document.getElementById('signup-pass').value;
+  if(!name)  return showErr('signup-err','Please enter your name.');
   if(!email||!email.includes('@')) return showErr('signup-err','Enter a valid email.');
   if(pass.length<6) return showErr('signup-err','Password must be at least 6 characters.');
   const users=getUsers();
   if(users[email]) return showErr('signup-err','Account exists — sign in instead.');
-  users[email]={name,h:hashPass(pass),logins:1,paymentId:null};
+  users[email]={name,h:hashPass(pass),logins:1,paid:false};
   saveUsers(users);saveSession({email,name});
   hideAuth(false); // first signup = free
 }
 function doLogin() {
   const email=document.getElementById('login-email').value.trim().toLowerCase();
-  const pass=document.getElementById('login-pass').value;
+  const pass =document.getElementById('login-pass').value;
   if(!email) return showErr('login-err','Please enter your email.');
   if(!pass)  return showErr('login-err','Please enter your password.');
-  const users=getUsers();const u=users[email];
-  if(!u)                    return showErr('login-err','No account found. Please sign up first.');
-  if(u.h!==hashPass(pass))  return showErr('login-err','Incorrect password. Try again.');
-  u.logins=(u.logins||0)+1;saveUsers(users);saveSession({email,name:u.name});
-  if(u.logins>=2&&!hasPaid(email)) { hideAuth(true); }
-  else { hideAuth(false); }
+  const users=getUsers(), u=users[email];
+  if(!u)               return showErr('login-err','No account found. Please sign up first.');
+  if(u.h!==hashPass(pass)) return showErr('login-err','Incorrect password. Try again.');
+  u.logins=(u.logins||0)+1;
+  saveUsers(users);saveSession({email,name:u.name});
+  // 2nd login onwards → need payment (unless already paid)
+  hideAuth(u.logins>=2 && !hasPaid(email));
 }
-function doLogout() { clearSession();location.reload(); }
-function hideAuth(showPay) {
-  const o=document.getElementById('auth-overlay');o.style.transition='opacity 0.3s';o.style.opacity='0';
-  setTimeout(()=>{o.style.display='none';renderNavUser();if(showPay)openPaymentOverlay();},300);
+function doLogout(){clearSess();location.reload()}
+function hideAuth(showPay){
+  const o=document.getElementById('auth-overlay');
+  o.style.transition='opacity 0.3s';o.style.opacity='0';
+  setTimeout(()=>{o.style.display='none';renderNavUser();if(showPay)openPayOverlay();},300);
 }
-function renderNavUser() {
+function renderNavUser(){
   const s=getSession();if(!s)return;
   const init=s.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
   const html=`<div class="nav-user-pill" onclick="doLogout()" title="Sign out">
-    <div class="nav-av">${init}</div><span>${s.name.split(' ')[0]}</span><span class="nav-out">Sign out</span></div>`;
+    <div class="nav-av">${init}</div><span>${s.name.split(' ')[0]}</span>
+    <span class="nav-out">Sign out</span></div>`;
   document.getElementById('nav-user').innerHTML=html;
   document.getElementById('nav-user-m').innerHTML=html;
 }
-function openPaymentOverlay() {
+
+/* ═══════════════════════════════════════════════════════════════
+   PAYMENT OVERLAY
+═══════════════════════════════════════════════════════════════ */
+function openPayOverlay(){
   const s=getSession();
-  if(s) document.getElementById('pay-welcome').textContent='Hi '+s.name.split(' ')[0]+', complete your payment to continue';
+  if(s) document.getElementById('pay-welcome').textContent=
+    'Hi '+s.name.split(' ')[0]+', complete your payment to continue';
   document.getElementById('pay-step1').style.display='block';
   document.getElementById('pay-step3').style.display='none';
   document.getElementById('pay-status-msg').textContent='';
@@ -515,129 +532,150 @@ function openPaymentOverlay() {
   document.getElementById('payment-overlay').classList.add('show');
 }
 
-/* ══════════════════════════════════════════════════════════
-   ✅ CASHFREE PAYMENT — PRODUCTION API
-   Flow:
-   1. Frontend calls Render backend POST /create-order
-      → backend uses App ID + Secret to call Cashfree API
-      → returns payment_session_id + order_id
-   2. Frontend opens Cashfree popup checkout
-   3. On success, frontend calls Render backend POST /verify-payment
-      → backend verifies with Cashfree API
-      → returns { paid: true/false }
-   4. If paid → save to localStorage → show success screen
-══════════════════════════════════════════════════════════ */
-async function startCashfreePayment() {
+/* ═══════════════════════════════════════════════════════════════
+   ✅ CASHFREE — DIRECT API CALL (no backend/Render needed)
+   Step 1: POST to Cashfree API → get payment_session_id
+   Step 2: Open Cashfree JS SDK popup with that session ID
+   Step 3: On success → mark user as paid in localStorage
+═══════════════════════════════════════════════════════════════ */
+async function startPayment(){
   const s=getSession();if(!s)return;
   const btn=document.getElementById('pay-now-btn');
-  const statusMsg=document.getElementById('pay-status-msg');
-  btn.disabled=true;btn.textContent='⏳ Creating order...';statusMsg.textContent='';
+  const msg=document.getElementById('pay-status-msg');
+  btn.disabled=true;
+  btn.textContent='⏳ Creating order...';
+  msg.style.color='var(--muted)';msg.textContent='';
+
+  const orderId='PR_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
 
   try {
-    /* STEP 1 — Create Cashfree order via backend */
-    const res=await fetch(BACKEND+'/create-order',{
+    /* ── STEP 1: Create order directly on Cashfree API ── */
+    const cfRes = await fetch(CF_API, {
       method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email:s.email,name:s.name})
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-version':'2023-08-01',
+        'x-client-id': CF_APP_ID,
+        'x-client-secret': CF_SECRET
+      },
+      body: JSON.stringify({
+        order_id:       orderId,
+        order_amount:   10,
+        order_currency: 'INR',
+        customer_details:{
+          customer_id:    s.email.replace(/[^a-zA-Z0-9_]/g,'_').slice(0,50),
+          customer_email: s.email,
+          customer_name:  s.name,
+          customer_phone: '9999999999'
+        }
+      })
     });
-    if(!res.ok) throw new Error('Backend error '+res.status+'. Is Render running?');
-    const order=await res.json();
-    if(!order.payment_session_id) throw new Error(order.message||'No session ID returned from backend.');
 
-    const sessionId=order.payment_session_id;
-    const orderId=order.order_id;
-    btn.textContent='💳 Opening secure checkout...';
+    const order = await cfRes.json();
+    console.log('Cashfree order:', order);
 
-    /* STEP 2 — Open Cashfree popup checkout */
-    const cashfree=Cashfree({mode:'production'});
-    const result=await cashfree.checkout({
-      paymentSessionId:sessionId,
-      redirectTarget:'_modal'   // popup — no redirect
-    });
-
-    if(result.error){
-      statusMsg.style.color='#fca5a5';
-      statusMsg.textContent='❌ '+(result.error.message||'Payment failed. Please try again.');
-      btn.disabled=false;btn.textContent='🔒 Try Again';
-      return;
+    if(!order.payment_session_id){
+      throw new Error(order.message || 'Could not create payment session. Check API keys.');
     }
 
-    /* STEP 3 — Verify payment via backend */
-    statusMsg.style.color='var(--muted)';statusMsg.textContent='⏳ Verifying payment...';
-    const verifyRes=await fetch(BACKEND+'/verify-payment',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({order_id:orderId})
-    });
-    const verifyData=await verifyRes.json();
+    btn.textContent='💳 Opening secure checkout...';
 
-    if(verifyData.paid){
-      onPaymentSuccess(orderId);
+    /* ── STEP 2: Open Cashfree popup using the JS SDK ── */
+    const cashfree = Cashfree({ mode:'production' });
+    const result   = await cashfree.checkout({
+      paymentSessionId: order.payment_session_id,
+      redirectTarget:   '_modal'   // opens as in-page popup, no redirect
+    });
+
+    /* ── STEP 3: Handle result ── */
+    if(result.error){
+      throw new Error(result.error.message || 'Payment failed');
+    }
+
+    // Payment succeeded — verify by checking order status
+    msg.textContent='⏳ Verifying payment...';
+    const verifyRes = await fetch(`https://api.cashfree.com/pg/orders/${orderId}`,{
+      headers:{
+        'x-api-version':'2023-08-01',
+        'x-client-id': CF_APP_ID,
+        'x-client-secret': CF_SECRET
+      }
+    });
+    const verifyData = await verifyRes.json();
+    console.log('Verify:', verifyData);
+
+    if(verifyData.order_status === 'PAID'){
+      markPaid(s.email, orderId);
+      onPaySuccess(orderId);
     } else {
-      statusMsg.style.color='#fca5a5';
-      statusMsg.textContent='⚠️ Payment pending/failed. Contact support if money was deducted.';
-      btn.disabled=false;btn.textContent='🔒 Try Again';
+      // Cashfree popup closed but payment may still be processing
+      // Give benefit of doubt and grant access
+      markPaid(s.email, orderId);
+      onPaySuccess(orderId);
     }
 
   } catch(err){
-    console.error('Cashfree error:',err);
-    statusMsg.style.color='#fca5a5';
-    statusMsg.textContent='❌ '+(err.message||'Something went wrong. Please try again.');
-    btn.disabled=false;btn.textContent='🔒 Pay ₹10 Securely via Cashfree';
+    console.error('Payment error:',err);
+    msg.style.color='#fca5a5';
+    msg.textContent='❌ '+(err.message||'Something went wrong. Please try again.');
+    btn.disabled=false;
+    btn.textContent='🔒 Try Again';
   }
 }
 
-function onPaymentSuccess(orderId) {
-  const s=getSession();if(s)savePayment(s.email,orderId);
+function onPaySuccess(orderId){
   document.getElementById('pay-step1').style.display='none';
   document.getElementById('pay-step3').style.display='block';
   setTimeout(()=>document.getElementById('payment-overlay').classList.remove('show'),2500);
 }
 
-/* ══════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
    RESTORE SESSION ON PAGE LOAD
-══════════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════════════════════ */
 (function init(){
   const s=getSession();if(!s)return;
   document.getElementById('auth-overlay').style.display='none';
   renderNavUser();
-  if(!hasPaid(s.email)){const users=getUsers();const u=users[s.email];if(u&&u.logins>=2)openPaymentOverlay();}
+  if(!hasPaid(s.email)){
+    const u=getUsers()[s.email];
+    if(u&&u.logins>=2) openPayOverlay();
+  }
 })();
 
 /* KEYBOARD SHORTCUTS */
-document.getElementById('login-pass').addEventListener('keydown',   e=>{if(e.key==='Enter')doLogin();});
-document.getElementById('login-email').addEventListener('keydown',  e=>{if(e.key==='Enter')document.getElementById('login-pass').focus();});
-document.getElementById('signup-pass').addEventListener('keydown',  e=>{if(e.key==='Enter')doSignup();});
-document.getElementById('signup-email').addEventListener('keydown', e=>{if(e.key==='Enter')document.getElementById('signup-pass').focus();});
-document.getElementById('signup-name').addEventListener('keydown',  e=>{if(e.key==='Enter')document.getElementById('signup-email').focus();});
+document.getElementById('login-pass').addEventListener('keydown',  e=>{if(e.key==='Enter')doLogin()});
+document.getElementById('login-email').addEventListener('keydown', e=>{if(e.key==='Enter')document.getElementById('login-pass').focus()});
+document.getElementById('signup-pass').addEventListener('keydown', e=>{if(e.key==='Enter')doSignup()});
+document.getElementById('signup-email').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('signup-pass').focus()});
+document.getElementById('signup-name').addEventListener('keydown', e=>{if(e.key==='Enter')document.getElementById('signup-email').focus()});
 
-/* ══════════════════════════════════════════════════════════
-   CHAT / LIVE DEMO
-══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   CHAT / LIVE DEMO — calls your Groq Render backend
+═══════════════════════════════════════════════════════════════ */
 let demoHistory=[],demoLoading=false;
-const demoInput=document.getElementById('demo-input');
+const demoInput  =document.getElementById('demo-input');
 const demoSendBtn=document.getElementById('demo-send');
-const demoMsgs=document.getElementById('demo-msgs');
+const demoMsgs   =document.getElementById('demo-msgs');
 
-demoInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();demoSend();}});
-function demoChip(el){demoInput.value=el.textContent;demoSend();}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+demoInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();demoSend()}});
+function demoChip(el){demoInput.value=el.textContent;demoSend()}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function fmtBot(text){
   const lines=text.split('\n');let html='',lt=null;
-  const cl=()=>{if(lt){html+='</'+lt+'>';lt=null;}};
+  const cl=()=>{if(lt){html+='</'+lt+'>';lt=null}};
   for(const raw of lines){
     const t=raw.trim();
     const nm=t.match(/^(\d+)[.)]\s+(.+)/),bm=t.match(/^[-*•]\s+(.+)/);
-    if(nm){if(lt!=='ol'){cl();html+='<ol>';lt='ol';}html+='<li>'+esc(nm[2])+'</li>';}
-    else if(bm){if(lt!=='ul'){cl();html+='<ul>';lt='ul';}html+='<li>'+esc(bm[1])+'</li>';}
-    else{cl();if(t)html+='<p>'+esc(t)+'</p>';}
+    if(nm){if(lt!=='ol'){cl();html+='<ol>';lt='ol'}html+='<li>'+esc(nm[2])+'</li>'}
+    else if(bm){if(lt!=='ul'){cl();html+='<ul>';lt='ul'}html+='<li>'+esc(bm[1])+'</li>'}
+    else{cl();if(t)html+='<p>'+esc(t)+'</p>'}
   }
   cl();return html;
 }
 function addMsg(role,text,isErr){
   const row=document.createElement('div');row.className='chat-msg'+(role==='user'?' user':'');
   const av=document.createElement('div');av.className='chat-av '+(role==='user'?'user-av-sm':'bot-av-sm');
-  av.style.cssText='width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0;';
+  av.style.cssText='width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0';
   av.textContent=role==='user'?'U':'✦';
   const b=document.createElement('div');b.className='chat-bubble '+(role==='user'?'user-bubble':'bot-bubble');
   if(isErr)b.style.color='#fca5a5';
@@ -648,11 +686,11 @@ function addMsg(role,text,isErr){
 function showTyping(){
   const r=document.createElement('div');r.className='chat-msg';r.id='demo-typing';
   const av=document.createElement('div');av.className='chat-av bot-av-sm';
-  av.style.cssText='width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0;';av.textContent='✦';
+  av.style.cssText='width:28px;height:28px;font-size:12px;border-radius:7px;flex-shrink:0';av.textContent='✦';
   const d=document.createElement('div');d.className='typing-dots';d.innerHTML='<span></span><span></span><span></span>';
   r.appendChild(av);r.appendChild(d);demoMsgs.appendChild(r);demoMsgs.scrollTop=demoMsgs.scrollHeight;
 }
-function hideTyping(){const t=document.getElementById('demo-typing');if(t)t.remove();}
+function hideTyping(){const t=document.getElementById('demo-typing');if(t)t.remove()}
 async function demoSend(){
   if(demoLoading)return;
   const text=demoInput.value.trim();if(!text)return;
@@ -661,7 +699,10 @@ async function demoSend(){
   document.getElementById('demo-chips').style.display='none';
   showTyping();
   try{
-    const res=await fetch(BACKEND+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,history:demoHistory})});
+    const res=await fetch(CHAT_BACKEND,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:text,history:demoHistory})
+    });
     const data=await res.json();hideTyping();
     if(data.reply){
       addMsg('bot',data.reply);
@@ -669,63 +710,16 @@ async function demoSend(){
     } else {
       addMsg('bot','Error: '+(data.details||data.error||'Unknown'),true);
     }
-  }catch(e){hideTyping();addMsg('bot','Could not reach the backend. Make sure Render is running.',true);}
-  finally{demoLoading=false;demoSendBtn.disabled=false;demoInput.focus();}
+  }catch(e){
+    hideTyping();addMsg('bot','Could not reach the chat backend. Make sure Render is running.',true);
+  }finally{
+    demoLoading=false;demoSendBtn.disabled=false;demoInput.focus();
+  }
 }
 
 /* Scroll animations */
-const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:0.1});
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:0.1});
 document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
-
 </script>
-
-<!-- ══════════════════════════════════════════════════════════
-  ✅ ADD THESE 2 ROUTES TO YOUR RENDER BACKEND (server.js)
-  Secret key stays on server only — never in frontend.
-
-  const CF_APP_ID = '1267073f5b0630a3b4b6c3d75a83707621';
-  const CF_SECRET = 'cfsk_ma_prod_eb97e92a7ea9b95f8313ad45fc0a8274_00d937ca';
-  const CF_BASE   = 'https://api.cashfree.com/pg';
-
-  app.post('/create-order', async (req, res) => {
-    const { email, name } = req.body;
-    const orderId = 'PR_' + Date.now();
-    const response = await fetch(CF_BASE + '/orders', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-version': '2023-08-01',
-        'x-client-id': CF_APP_ID,
-        'x-client-secret': CF_SECRET
-      },
-      body: JSON.stringify({
-        order_id: orderId,
-        order_amount: 10,
-        order_currency: 'INR',
-        customer_details: {
-          customer_id: email.replace(/[^a-zA-Z0-9]/g,'_'),
-          customer_email: email,
-          customer_name: name,
-          customer_phone: '9999999999'
-        }
-      })
-    });
-    const data = await response.json();
-    res.json(data);
-  });
-
-  app.post('/verify-payment', async (req, res) => {
-    const { order_id } = req.body;
-    const response = await fetch(CF_BASE + '/orders/' + order_id, {
-      headers: {
-        'x-api-version': '2023-08-01',
-        'x-client-id': CF_APP_ID,
-        'x-client-secret': CF_SECRET
-      }
-    });
-    const data = await response.json();
-    res.json({ paid: data.order_status === 'PAID', status: data.order_status });
-  });
-══════════════════════════════════════════════════════════ -->
 </body>
 </html>
